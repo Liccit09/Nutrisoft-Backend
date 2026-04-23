@@ -49,7 +49,6 @@ yarn-error.log*
 
 # Build
 build/
-out/
 
 # Spring Boot
 .springBoot
