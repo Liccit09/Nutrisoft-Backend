@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: nutrisoft-backend
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/nutrisoft_db
+    username: nutrisoft_user
+    password: nutrisoft_password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          fetch_size: 50
+          batch_size: 25
+        order_inserts: true
+        order_updates: true
+
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+logging:
+  level:
+    root: INFO
+    com.nutrisoft: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+springdoc:
+  api-docs:
+    path: /v1/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operations-sorter: method
+    tags-sorter: alpha
+

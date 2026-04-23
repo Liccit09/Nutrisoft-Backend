@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.nutrisoft</groupId>
+    <artifactId>nutrisoft-backend</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>Nutrisoft Backend</name>
+    <description>Backend for Nutrisoft Appointment Management System</description>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.0</version>
+        <relativePath/>
+    </parent>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring-cloud.version>2023.0.1</spring-cloud.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <springdoc-openapi.version>2.3.0</springdoc-openapi.version>
+        <lombok.version>1.18.30</lombok.version>
+    </properties>
+
+    <dependencies>
+        <!-- Spring Boot Web Starter -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Spring Boot Data JPA -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!-- PostgreSQL Driver -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.3</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Lombok for reducing boilerplate -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- MapStruct for Object Mapping -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+
+        <!-- SpringDoc OpenAPI (Swagger 3.0) -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc-openapi.version}</version>
+        </dependency>
+
+        <!-- Validation -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!-- Spring Boot Actuator -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- OpenAPI Generator Plugin -->
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>openapi-generator-maven-plugin</artifactId>
+            <version>7.2.0</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Spring Boot Maven Plugin -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <!-- Compiler Plugin with MapStruct -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.12.1</version>
+                <configuration>
+                    <source>21</source>
+                    <target>21</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                    <!-- MapStruct Global Configuration -->
+                    <!-- componentModel: Generate Spring components by default for all @Mapper interfaces -->
+                    <!-- This eliminates the need for componentModel = "spring" in each @Mapper annotation -->
+                    <compilerArgs>
+                        <arg>-Amapstruct.defaultComponentModel=spring</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+
+            <!-- OpenAPI Generator Plugin for Code Generation -->
+            <!-- Generates REST API interfaces from OpenAPI 3.0 specification (appointments-api.yaml) -->
+            <!-- Generated code goes to: src/main/java/com/nutrisoft/userInterface/api/rest/appointment/generated/ -->
+            <!-- Strategy: API-First - Contract drives implementation -->
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>7.2.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <!-- OpenAPI Specification File -->
+                            <inputSpec>${project.basedir}/src/main/resources/openapi/appointments-api.yaml</inputSpec>
+
+                            <!-- Spring Framework Code Generator -->
+                            <generatorName>spring</generatorName>
+
+                            <!-- Output Package for Generated API Interfaces -->
+                            <!-- Located in: UserInterface\API\Rest\Appointment\Generated -->
+                            <apiPackage>com.nutrisoft.userinterface.api.rest.appointment.generated</apiPackage>
+
+                            <!-- Output Package for Generated Model/DTO Classes -->
+                            <modelPackage>com.nutrisoft.userinterface.api.rest.appointment.generated.model</modelPackage>
+
+                            <!-- Generate only interface (no implementation) -->
+                            <supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
+
+                            <!-- Generator Configuration Options -->
+                            <configOptions>
+                                <!-- Use Spring Boot 3 features -->
+                                <useSpringBoot3>true</useSpringBoot3>
+
+                                <!-- Generate only interface, not implementation -->
+                                <interfaceOnly>true</interfaceOnly>
+
+                                <!-- Use Jakarta EE (Spring Boot 3+) -->
+                                <useJakartaEe>true</useJakartaEe>
+
+                                <!-- Skip generation if spec hasn't changed -->
+                                <skipIfSpecIsUnchanged>true</skipIfSpecIsUnchanged>
+
+                                <!-- Date/Time library -->
+                                <dateLibrary>java8</dateLibrary>
+
+                                <!-- JSON serialization library -->
+                                <serializationLibrary>jackson</serializationLibrary>
+
+                                <!-- Use Lombok for generated models -->
+                                <useLombok>true</useLombok>
+                                <openApiNullable>false</openApiNullable>
+                                <useTags>true</useTags>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+

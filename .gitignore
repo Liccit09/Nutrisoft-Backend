@@ -1,0 +1,61 @@
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+.flattened-pom.xml
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+.m2/
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.classpath
+.project
+.settings/
+bin/
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.gradle/
+
+# Runtime
+.env
+.env.local
+.env.*.local
+
+# Build
+build/
+out/
+
+# Spring Boot
+.springBoot
+spring-boot-maven-plugin:repackage
+
+# Database
+postgres_data/
+*.db
+*.sqlite
