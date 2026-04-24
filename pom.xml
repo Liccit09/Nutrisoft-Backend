@@ -136,7 +136,7 @@
             </plugin>
 
             <!-- OpenAPI Generator Plugin for Code Generation -->
-            <!-- Generates REST API interfaces from OpenAPI 3.0 specification (appointments-api.yaml) -->
+            <!-- Generates REST API interfaces from OpenAPI 3.0 specification (appointments-api-v1.yaml) -->
             <!-- Generated code goes to: src/main/java/com/nutrisoft/userInterface/api/rest/appointment/generated/ -->
             <!-- Strategy: API-First - Contract drives implementation -->
             <plugin>
@@ -150,7 +150,7 @@
                         </goals>
                         <configuration>
                             <!-- OpenAPI Specification File -->
-                            <inputSpec>${project.basedir}/src/main/resources/openapi/appointments-api.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/openapi/appointments-api-v1.yaml</inputSpec>
 
                             <!-- Spring Framework Code Generator -->
                             <generatorName>spring</generatorName>
