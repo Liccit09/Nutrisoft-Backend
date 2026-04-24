@@ -163,7 +163,7 @@ curl http://localhost:8080/api/v1/appointments
 
 4. **Update OpenAPI spec**:
    ```yaml
-   # src/main/resources/openapi/appointments-api.yaml
+   # src/main/resources/openapi/appointments-api-v1.yaml
    /v1/appointments/some-endpoint/{id}:
      get:
        operationId: someEndpoint

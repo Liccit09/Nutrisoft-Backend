@@ -1,0 +1,548 @@
+openapi: 3.0.0
+info:
+  title: Nutrisoft Appointment API
+  description: API for managing appointment scheduling in Nutrisoft nutrition clinics
+  version: 1.0.0
+  contact:
+    name: Nutrisoft Support
+    email: support@nutrisoft.com
+
+servers:
+  - url: http://localhost:8080/api
+    description: Development server
+
+tags:
+  - name: Appointments
+    description: Operations related to appointment management
+
+paths:
+  /v1/appointments:
+    post:
+      summary: Create a new appointment
+      description: Creates a new appointment for a patient with a professional
+      operationId: createAppointment
+      tags:
+        - Appointments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAppointmentRequest'
+      responses:
+        '201':
+          description: Appointment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Patient, Professional, or Service not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      summary: List all appointments
+      description: Retrieves all appointments
+      operationId: listAppointments
+      tags:
+        - Appointments
+      responses:
+        '200':
+          description: List of appointments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AppointmentResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/appointments/{appointmentId}:
+    get:
+      summary: Get an appointment by ID
+      description: Retrieves an appointment by its ID
+      operationId: getAppointment
+      tags:
+        - Appointments
+      parameters:
+        - name: appointmentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The appointment ID
+      responses:
+        '200':
+          description: Appointment found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentResponse'
+        '404':
+          description: Appointment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/appointments/{appointmentId}/confirm:
+    post:
+      summary: Confirm an appointment
+      description: Confirms a scheduled appointment
+      operationId: confirmAppointment
+      tags:
+        - Appointments
+      parameters:
+        - name: appointmentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The appointment ID
+      responses:
+        '200':
+          description: Appointment confirmed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentResponse'
+        '404':
+          description: Appointment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict - Cannot confirm appointment in this state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/appointments/{appointmentId}/cancel:
+    post:
+      summary: Cancel an appointment
+      description: Cancels a scheduled or confirmed appointment
+      operationId: cancelAppointment
+      tags:
+        - Appointments
+      parameters:
+        - name: appointmentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The appointment ID
+      responses:
+        '200':
+          description: Appointment cancelled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentResponse'
+        '404':
+          description: Appointment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict - Cannot cancel appointment in this state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/appointments/{appointmentId}/complete:
+    post:
+      summary: Mark appointment as completed
+      description: Marks an appointment as completed
+      operationId: completeAppointment
+      tags:
+        - Appointments
+      parameters:
+        - name: appointmentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The appointment ID
+      responses:
+        '200':
+          description: Appointment marked as completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentResponse'
+        '404':
+          description: Appointment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/appointments/{appointmentId}/no-show:
+    post:
+      summary: Mark appointment as no-show
+      description: Marks an appointment as no-show
+      operationId: markNoShowAppointment
+      tags:
+        - Appointments
+      parameters:
+        - name: appointmentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The appointment ID
+      responses:
+        '200':
+          description: Appointment marked as no-show successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentResponse'
+        '404':
+          description: Appointment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/appointments/{appointmentId}/reschedule:
+    put:
+      summary: Reschedule an appointment
+      description: Reschedules an existing appointment by updating its start time
+      operationId: rescheduleAppointment
+      tags:
+        - Appointments
+      parameters:
+        - name: appointmentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The appointment ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RescheduleAppointmentRequest'
+      responses:
+        '200':
+          description: Appointment updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Appointment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict - Cannot update appointment in this state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/appointments/{appointmentId}/virtual-link:
+    put:
+      summary: Register virtual meeting link for an appointment
+      description: Registers a virtual meeting link for an existing appointment
+      operationId: registerVirtualMeetingLink
+      tags:
+        - Appointments
+      parameters:
+        - name: appointmentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The appointment ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterVirtualMeetingLinkRequest'
+      responses:
+        '200':
+          description: Appointment updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Appointment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict - Cannot update appointment in this state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/appointments/patient/{patientId}:
+    get:
+      summary: List appointments by patient
+      description: Retrieves all appointments for a specific patient
+      operationId: listAppointmentsByPatient
+      tags:
+        - Appointments
+      parameters:
+        - name: patientId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The patient ID
+      responses:
+        '200':
+          description: List of appointments for the patient
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AppointmentResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/appointments/professional/{professionalId}:
+    get:
+      summary: List appointments by professional
+      description: Retrieves all appointments for a specific professional
+      operationId: listAppointmentsByProfessional
+      tags:
+        - Appointments
+      parameters:
+        - name: professionalId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The professional ID
+      responses:
+        '200':
+          description: List of appointments for the professional
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AppointmentResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    CreateAppointmentRequest:
+      type: object
+      required:
+        - patientId
+        - professionalId
+        - serviceId
+        - startTime
+        - mode
+      properties:
+        patientId:
+          type: string
+          format: uuid
+          description: The ID of the patient
+        professionalId:
+          type: string
+          format: uuid
+          description: The ID of the professional
+        serviceId:
+          type: string
+          format: uuid
+          description: The ID of the service
+        startTime:
+          type: string
+          format: date-time
+          description: The start time of the appointment (ISO 8601 format)
+        mode:
+          type: string
+          enum:
+            - IN_PERSON
+            - VIRTUAL
+          description: Optional notes for the appointment
+        virtualMeetingLink:
+          type: string
+          description: Optional virtual meeting link for online appointments
+
+    RescheduleAppointmentRequest:
+      type: object
+      required:
+        - startTime
+      properties:
+        startTime:
+          type: string
+          format: date-time
+          description: The start time of the appointment (ISO 8601 format)
+
+    RegisterVirtualMeetingLinkRequest:
+      type: object
+      required:
+        - virtualMeetingLink
+      properties:
+        virtualMeetingLink:
+          type: string
+          description: Optional virtual meeting link for online appointments
+
+    AppointmentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The appointment ID
+        patientId:
+          type: string
+          format: uuid
+          description: The ID of the patient
+        professionalId:
+          type: string
+          format: uuid
+          description: The ID of the professional
+        serviceId:
+          type: string
+          format: uuid
+          description: The ID of the service
+        startTime:
+          type: string
+          format: date-time
+          description: The start time of the appointment
+        mode:
+          type: string
+          enum: [ IN_PERSON, VIRTUAL ]
+          description: The mode of the appointment
+        status:
+          type: string
+          enum: [ SCHEDULED, CONFIRMED, CANCELLED, COMPLETED, NO_SHOW ]
+          description: The status of the appointment
+        virtualMeetingLink:
+          type: string
+          description: The virtual meeting link for online appointments
+        createdAt:
+          type: string
+          format: date-time
+          description: When the appointment was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: When the appointment was last updated
+
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+
