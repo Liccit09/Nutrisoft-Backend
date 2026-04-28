@@ -11,13 +11,13 @@
 -- PATIENTS - Sample patient data
 -- =============================================================================
 
-INSERT INTO patients (id, first_name, last_name, email, phone_number, medical_history, created_at, updated_at)
+INSERT INTO patients (id, first_name, last_name, date_of_birth, email, phone_number, address, created_at, updated_at)
 VALUES
-    ('550e8400-e29b-41d4-a716-446655440001', 'Juan', 'García', 'juan.garcia@email.com', '305-555-0101', 'Diabetes type 2, Regular exercise', NOW(), NOW()),
-    ('550e8400-e29b-41d4-a716-446655440002', 'María', 'López', 'maria.lopez@email.com', '305-555-0102', 'Hypertension, Low sodium diet', NOW(), NOW()),
-    ('550e8400-e29b-41d4-a716-446655440003', 'Carlos', 'Rodríguez', 'carlos.rodriguez@email.com', '305-555-0103', 'Obesity management, Fitness goals', NOW(), NOW()),
-    ('550e8400-e29b-41d4-a716-446655440004', 'Ana', 'Martínez', 'ana.martinez@email.com', '305-555-0104', 'Gluten sensitivity, Plant-based diet', NOW(), NOW()),
-    ('550e8400-e29b-41d4-a716-446655440005', 'Roberto', 'Pérez', 'roberto.perez@email.com', '305-555-0105', 'Athletic performance enhancement', NOW(), NOW())
+    ('550e8400-e29b-41d4-a716-446655440001', 'Juan', 'García', '1985-03-15', 'juan.garcia@email.com', '305-555-0101', 'Calle Principal 123, Miami', NOW(), NOW()),
+    ('550e8400-e29b-41d4-a716-446655440002', 'María', 'López', '1990-07-22', 'maria.lopez@email.com', '305-555-0102', 'Avenida Central 456, Miami Beach', NOW(), NOW()),
+    ('550e8400-e29b-41d4-a716-446655440003', 'Carlos', 'Rodríguez', '1988-11-08', 'carlos.rodriguez@email.com', '305-555-0103', 'Calle del Río 789, Coral Gables', NOW(), NOW()),
+    ('550e8400-e29b-41d4-a716-446655440004', 'Ana', 'Martínez', '1992-05-30', 'ana.martinez@email.com', '305-555-0104', 'Paseo de la Playa 321, Miami', NOW(), NOW()),
+    ('550e8400-e29b-41d4-a716-446655440005', 'Roberto', 'Pérez', '1987-09-12', 'roberto.perez@email.com', '305-555-0105', 'Boulevard del Mar 654, Miami', NOW(), NOW())
 ON CONFLICT DO NOTHING;
 
 -- =============================================================================
@@ -51,16 +51,16 @@ ON CONFLICT DO NOTHING;
 -- =============================================================================
 
 -- Scheduled appointments (next 7 days)
-INSERT INTO appointments (id, patient_id, professional_id, service_id, start_time, end_time, status, notes, created_at, updated_at)
+INSERT INTO appointments (id, patient_id, professional_id, service_id, start_time, mode, status, virtual_meeting_link, created_at, updated_at)
 VALUES
     ('850e8400-e29b-41d4-a716-446655440001',
      '550e8400-e29b-41d4-a716-446655440001',
      '650e8400-e29b-41d4-a716-446655440001',
      '750e8400-e29b-41d4-a716-446655440001',
      NOW() + INTERVAL '2 days' + INTERVAL '09:00',
-     NOW() + INTERVAL '2 days' + INTERVAL '10:00',
+     'IN_PERSON',
      'SCHEDULED',
-     'Patient is new, comprehensive assessment needed',
+     NULL,
      NOW(), NOW()),
 
     ('850e8400-e29b-41d4-a716-446655440002',
@@ -68,9 +68,9 @@ VALUES
      '650e8400-e29b-41d4-a716-446655440003',
      '750e8400-e29b-41d4-a716-446655440003',
      NOW() + INTERVAL '3 days' + INTERVAL '10:30',
-     NOW() + INTERVAL '3 days' + INTERVAL '11:15',
+     'VIRTUAL',
      'CONFIRMED',
-     'Patient is committed to weight management program',
+     'https://meet.example.com/session-001',
      NOW(), NOW()),
 
     ('850e8400-e29b-41d4-a716-446655440003',
@@ -78,9 +78,9 @@ VALUES
      '650e8400-e29b-41d4-a716-446655440002',
      '750e8400-e29b-41d4-a716-446655440004',
      NOW() + INTERVAL '4 days' + INTERVAL '14:00',
-     NOW() + INTERVAL '4 days' + INTERVAL '15:00',
+     'IN_PERSON',
      'SCHEDULED',
-     'Athlete preparing for competition, need sports nutrition plan',
+     NULL,
      NOW(), NOW()),
 
     ('850e8400-e29b-41d4-a716-446655440004',
@@ -88,9 +88,9 @@ VALUES
      '650e8400-e29b-41d4-a716-446655440001',
      '750e8400-e29b-41d4-a716-446655440006',
      NOW() + INTERVAL '5 days' + INTERVAL '11:00',
-     NOW() + INTERVAL '5 days' + INTERVAL '11:30',
+     'IN_PERSON',
      'SCHEDULED',
-     'Gluten-free meal planning assistance',
+     NULL,
      NOW(), NOW()),
 
     ('850e8400-e29b-41d4-a716-446655440005',
@@ -98,24 +98,24 @@ VALUES
      '650e8400-e29b-41d4-a716-446655440002',
      '750e8400-e29b-41d4-a716-446655440004',
      NOW() + INTERVAL '6 days' + INTERVAL '16:00',
-     NOW() + INTERVAL '6 days' + INTERVAL '17:00',
+     'VIRTUAL',
      'CONFIRMED',
-     'Follow-up on training nutrition',
+     'https://meet.example.com/session-002',
      NOW(), NOW())
 
 ON CONFLICT DO NOTHING;
 
 -- Completed appointments (past)
-INSERT INTO appointments (id, patient_id, professional_id, service_id, start_time, end_time, status, notes, created_at, updated_at)
+INSERT INTO appointments (id, patient_id, professional_id, service_id, start_time, mode, status, virtual_meeting_link, created_at, updated_at)
 VALUES
     ('850e8400-e29b-41d4-a716-446655440010',
      '550e8400-e29b-41d4-a716-446655440001',
      '650e8400-e29b-41d4-a716-446655440001',
      '750e8400-e29b-41d4-a716-446655440002',
      NOW() - INTERVAL '5 days' + INTERVAL '09:00',
-     NOW() - INTERVAL '5 days' + INTERVAL '09:30',
+     'IN_PERSON',
      'COMPLETED',
-     'Follow-up session, good progress',
+     NULL,
      NOW(), NOW()),
 
     ('850e8400-e29b-41d4-a716-446655440011',
@@ -123,24 +123,24 @@ VALUES
      '650e8400-e29b-41d4-a716-446655440003',
      '750e8400-e29b-41d4-a716-446655440005',
      NOW() - INTERVAL '10 days' + INTERVAL '14:00',
-     NOW() - INTERVAL '10 days' + INTERVAL '14:45',
+     'VIRTUAL',
      'COMPLETED',
-     'Initial diabetes consultation',
+     'https://meet.example.com/session-003',
      NOW(), NOW())
 
 ON CONFLICT DO NOTHING;
 
 -- Cancelled appointment
-INSERT INTO appointments (id, patient_id, professional_id, service_id, start_time, end_time, status, notes, created_at, updated_at)
+INSERT INTO appointments (id, patient_id, professional_id, service_id, start_time, mode, status, virtual_meeting_link, created_at, updated_at)
 VALUES
     ('850e8400-e29b-41d4-a716-446655440020',
      '550e8400-e29b-41d4-a716-446655440003',
      '650e8400-e29b-41d4-a716-446655440002',
      '750e8400-e29b-41d4-a716-446655440002',
      NOW() - INTERVAL '7 days' + INTERVAL '10:00',
-     NOW() - INTERVAL '7 days' + INTERVAL '10:30',
+     'IN_PERSON',
      'CANCELLED',
-     'Patient requested cancellation',
+     NULL,
      NOW(), NOW())
 
 ON CONFLICT DO NOTHING;

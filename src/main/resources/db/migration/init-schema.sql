@@ -7,9 +7,10 @@ CREATE TABLE IF NOT EXISTS patients (
     id UUID PRIMARY KEY,
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
+    date_of_birth DATE,
     email VARCHAR(255) NOT NULL,
     phone_number VARCHAR(20) NOT NULL,
-    medical_history TEXT,
+    address VARCHAR(255),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -55,9 +56,9 @@ CREATE TABLE IF NOT EXISTS appointments (
     professional_id UUID NOT NULL REFERENCES professionals(id) ON DELETE CASCADE,
     service_id UUID NOT NULL REFERENCES services(id) ON DELETE CASCADE,
     start_time TIMESTAMP NOT NULL,
-    end_time TIMESTAMP NOT NULL,
+    mode VARCHAR(50) NOT NULL,
     status VARCHAR(50) NOT NULL DEFAULT 'SCHEDULED',
-    notes TEXT,
+    virtual_meeting_link VARCHAR(255),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -66,7 +67,6 @@ CREATE INDEX IF NOT EXISTS idx_appointments_patient_id ON appointments(patient_i
 CREATE INDEX IF NOT EXISTS idx_appointments_professional_id ON appointments(professional_id);
 CREATE INDEX IF NOT EXISTS idx_appointments_status ON appointments(status);
 CREATE INDEX IF NOT EXISTS idx_appointments_start_time ON appointments(start_time);
-CREATE INDEX IF NOT EXISTS idx_appointments_end_time ON appointments(end_time);
 
 -- Comments for documentation
 COMMENT ON TABLE patients IS 'Stores patient information within the Appointment context. In future, this may be replaced with a reference to a Patient bounded context.';

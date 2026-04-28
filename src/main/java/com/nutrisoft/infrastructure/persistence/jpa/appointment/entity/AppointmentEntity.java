@@ -2,10 +2,7 @@ package com.nutrisoft.infrastructure.persistence.jpa.appointment.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -36,16 +33,13 @@ public class AppointmentEntity {
   @Column(columnDefinition = "UUID")
   private UUID id;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "patient_id", nullable = false)
+  @Column(name = "patient_id", nullable = false, columnDefinition = "UUID")
   private UUID patientId;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "professional_id", nullable = false)
+  @Column(name = "professional_id", nullable = false, columnDefinition = "UUID")
   private UUID professionalId;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "service_id", nullable = false)
+  @Column(name = "service_id", nullable = false, columnDefinition = "UUID")
   private UUID serviceId;
 
   @Column(nullable = false)
