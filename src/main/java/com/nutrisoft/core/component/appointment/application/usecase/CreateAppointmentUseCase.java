@@ -3,6 +3,9 @@ package com.nutrisoft.core.component.appointment.application.usecase;
 import com.nutrisoft.core.component.appointment.application.command.AppointmentCommandDto;
 import com.nutrisoft.core.component.appointment.domain.Appointment;
 import com.nutrisoft.core.component.appointment.domain.AppointmentMode;
+import com.nutrisoft.core.component.patient.application.usecase.GetPatientByIdUseCase;
+import com.nutrisoft.core.component.professional.application.usecase.GetProfessionalByIdUseCase;
+import com.nutrisoft.core.component.service.application.usecase.GetServiceByIdUseCase;
 import com.nutrisoft.core.port.out.persistence.appointment.AppointmentRepositoryPort;
 import com.nutrisoft.core.shared.component.patient.PatientId;
 import com.nutrisoft.core.shared.component.professional.ProfessionalId;
@@ -25,6 +28,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class CreateAppointmentUseCase {
 
+  private final GetPatientByIdUseCase findByIdPatientUseCase;
+  private final GetProfessionalByIdUseCase findByIdProfessionalUseCase;
+  private final GetServiceByIdUseCase findByIdServiceUseCase;
+
   private final AppointmentRepositoryPort appointmentRepository;
 
   /**
@@ -36,7 +43,7 @@ public class CreateAppointmentUseCase {
   public Appointment execute(final AppointmentCommandDto commandDto) {
     log.info("Creating new appointment for patient: {}", commandDto.getPatientId());
 
-    // TODO: Ensure that related entities exist (Patient, Professional, Service)
+    ensureEntitiesExist(commandDto);
 
     final var appointment =
         Appointment.create(
@@ -44,7 +51,7 @@ public class CreateAppointmentUseCase {
             ProfessionalId.of(commandDto.getProfessionalId()),
             ServiceId.of(commandDto.getServiceId()),
             commandDto.getStartTime(),
-            AppointmentMode.fromString(commandDto.getMode()),
+            Enum.valueOf(AppointmentMode.class, commandDto.getMode()),
             commandDto.getVirtualMeetingLink());
 
     appointmentRepository.save(appointment);
@@ -52,5 +59,11 @@ public class CreateAppointmentUseCase {
     log.info("Appointment created successfully with ID: {}", appointment.getId());
 
     return appointment;
+  }
+
+  private void ensureEntitiesExist(final AppointmentCommandDto commandDto) {
+    findByIdPatientUseCase.execute(commandDto.getPatientId());
+    findByIdProfessionalUseCase.execute(commandDto.getProfessionalId());
+    findByIdServiceUseCase.execute(commandDto.getServiceId());
   }
 }

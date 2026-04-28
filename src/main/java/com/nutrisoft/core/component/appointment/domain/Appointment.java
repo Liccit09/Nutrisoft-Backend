@@ -6,10 +6,10 @@ import com.nutrisoft.core.shared.component.professional.ProfessionalId;
 import com.nutrisoft.core.shared.component.service.ServiceId;
 import com.nutrisoft.core.shared.ddd.AggregateRoot;
 import com.nutrisoft.core.shared.ddd.DomainEvent;
-import java.net.URI;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NonNull;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Appointment Aggregate Root. This is the main aggregate that manages appointments in the system.
@@ -30,7 +30,7 @@ public class Appointment extends AggregateRoot<AppointmentId> {
   private LocalDateTime startTime;
   private final AppointmentMode mode;
   private AppointmentStatus status;
-  private URI virtualMeetingLink;
+  private String virtualMeetingLink;
   private final LocalDateTime createdAt;
   private LocalDateTime updatedAt;
 
@@ -42,7 +42,7 @@ public class Appointment extends AggregateRoot<AppointmentId> {
       @NonNull final LocalDateTime startTime,
       @NonNull final AppointmentMode mode,
       @NonNull final AppointmentStatus status,
-      final URI virtualMeetingLink,
+      final String virtualMeetingLink,
       final LocalDateTime createdAt,
       final LocalDateTime updatedAt) {
     super(id);
@@ -55,6 +55,26 @@ public class Appointment extends AggregateRoot<AppointmentId> {
     this.virtualMeetingLink = virtualMeetingLink;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
+
+    validate();
+  }
+
+  private void validate() {
+    assertVirtualModeIsValid();
+    assertStartTimeIsInFuture();
+  }
+
+  private void assertVirtualModeIsValid() {
+    if (!StringUtils.isBlank(virtualMeetingLink) && !mode.isVirtual()) {
+      throw new IllegalStateException(
+          "Cannot register virtual meeting link for non-virtual appointment");
+    }
+  }
+
+  private void assertStartTimeIsInFuture() {
+    if (startTime.isBefore(LocalDateTime.now())) {
+      throw new IllegalStateException("Appointment start time must be in the future");
+    }
   }
 
   public static Appointment create(
@@ -77,7 +97,7 @@ public class Appointment extends AggregateRoot<AppointmentId> {
             startTime,
             mode,
             AppointmentStatus.SCHEDULED,
-            URI.create(virtualMeetingLink),
+            virtualMeetingLink,
             now,
             now);
 
@@ -92,8 +112,10 @@ public class Appointment extends AggregateRoot<AppointmentId> {
     if (!status.canBeConfirmed()) {
       throw new IllegalStateException("Cannot confirm appointment with status: " + status);
     }
+
     this.status = AppointmentStatus.CONFIRMED;
     this.updatedAt = LocalDateTime.now();
+    validate();
     this.registerEvent(new AppointmentConfirmedEvent(this.id.toString(), LocalDateTime.now()));
   }
 
@@ -104,22 +126,35 @@ public class Appointment extends AggregateRoot<AppointmentId> {
     if (!status.canBeCancelled()) {
       throw new IllegalStateException("Cannot cancel appointment with status: " + status);
     }
+
     this.status = AppointmentStatus.CANCELLED;
     this.updatedAt = LocalDateTime.now();
+    validate();
     this.registerEvent(new AppointmentCancelledEvent(this.id.toString(), LocalDateTime.now()));
   }
 
   /** Mark the appointment as completed. */
   public void markAsCompleted() {
+    if (!status.canBeMarkedAsCompleted()) {
+      throw new IllegalStateException(
+          "Cannot mark appointment as completed with status: " + status);
+    }
+
     this.status = AppointmentStatus.COMPLETED;
     this.updatedAt = LocalDateTime.now();
+    validate();
     this.registerEvent(new AppointmentCompletedEvent(this.id.toString(), LocalDateTime.now()));
   }
 
   /** Mark the appointment as no-show. */
   public void markAsNoShow() {
+    if (!status.canBeMarkedAsNoShow()) {
+      throw new IllegalStateException("Cannot mark appointment as no-show with status: " + status);
+    }
+
     this.status = AppointmentStatus.NO_SHOW;
     this.updatedAt = LocalDateTime.now();
+    validate();
     this.registerEvent(new AppointmentNoShowEvent(this.id.toString(), LocalDateTime.now()));
   }
 
@@ -134,6 +169,7 @@ public class Appointment extends AggregateRoot<AppointmentId> {
 
     this.startTime = newStartTime;
     this.updatedAt = LocalDateTime.now();
+    validate();
     this.registerEvent(new AppointmentUpdatedEvent(this.id.toString(), LocalDateTime.now()));
   }
 
@@ -142,18 +178,18 @@ public class Appointment extends AggregateRoot<AppointmentId> {
    * not virtual. Cannot register if appointment is completed or no-show.
    */
   public void registerVirtualMeetingLink(final String virtualMeetingLink) {
-    if (mode != AppointmentMode.VIRTUAL) {
-      throw new IllegalStateException(
-          "Cannot register virtual meeting link for non-virtual appointment");
-    }
-
     if (!status.canBeUpdated()) {
       throw new IllegalStateException(
           "Cannot register virtual meeting link for appointment with status: " + status);
     }
 
-    this.virtualMeetingLink = URI.create(virtualMeetingLink);
+    if (StringUtils.isBlank(virtualMeetingLink)) {
+      throw new IllegalArgumentException("Virtual meeting link cannot be blank");
+    }
+
+    this.virtualMeetingLink = virtualMeetingLink;
     this.updatedAt = LocalDateTime.now();
+    validate();
     this.registerEvent(new AppointmentUpdatedEvent(this.id.toString(), LocalDateTime.now()));
   }
 

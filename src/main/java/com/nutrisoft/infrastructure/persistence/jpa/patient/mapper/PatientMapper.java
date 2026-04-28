@@ -3,7 +3,10 @@ package com.nutrisoft.infrastructure.persistence.jpa.patient.mapper;
 import com.nutrisoft.core.component.patient.domain.Patient;
 import com.nutrisoft.core.shared.mapper.ValueObjectMapper;
 import com.nutrisoft.infrastructure.persistence.jpa.patient.entity.PatientEntity;
+
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 /**
  * Mapper for converting Patient Domain to JPA Entity and vice versa.
@@ -17,7 +20,10 @@ import org.mapstruct.Mapper;
 @Mapper(uses = ValueObjectMapper.class)
 public interface PatientMapper {
 
+  @Mapping(target = "email", source = "contactInfo.email.value")
+  @Mapping(target = "phoneNumber", source = "contactInfo.phoneNumber")
   PatientEntity toEntity(Patient patient);
 
+  @InheritInverseConfiguration
   Patient toDomain(PatientEntity entity);
 }

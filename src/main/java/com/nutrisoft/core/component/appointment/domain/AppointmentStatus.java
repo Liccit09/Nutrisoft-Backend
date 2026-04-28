@@ -19,14 +19,6 @@ public enum AppointmentStatus implements ValueObject {
   COMPLETED,
   NO_SHOW;
 
-  public static AppointmentStatus fromString(String status) {
-    try {
-      return AppointmentStatus.valueOf(status.toUpperCase());
-    } catch (IllegalArgumentException e) {
-      throw new IllegalArgumentException("Invalid appointment status: " + status);
-    }
-  }
-
   public boolean isScheduled() {
     return SCHEDULED.equals(this);
   }
@@ -48,7 +40,15 @@ public enum AppointmentStatus implements ValueObject {
   }
 
   public boolean canBeCancelled() {
-    return isScheduled() || isConfirmed();
+    return canBeUpdated();
+  }
+
+  public boolean canBeMarkedAsCompleted() {
+    return isConfirmed();
+  }
+
+  public boolean canBeMarkedAsNoShow() {
+    return isConfirmed();
   }
 
   public boolean canBeConfirmed() {

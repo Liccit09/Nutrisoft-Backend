@@ -6,11 +6,11 @@ public enum AppointmentMode implements ValueObject {
   IN_PERSON,
   VIRTUAL;
 
-  public static AppointmentMode fromString(final String mode) {
-    try {
-      return AppointmentMode.valueOf(mode.toUpperCase());
-    } catch (IllegalArgumentException e) {
-      throw new IllegalArgumentException("Invalid appointment mode: " + mode);
-    }
+  public boolean isInPerson() {
+    return IN_PERSON.equals(this);
+  }
+
+  public boolean isVirtual() {
+    return VIRTUAL.equals(this);
   }
 }

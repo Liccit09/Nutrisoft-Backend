@@ -4,7 +4,6 @@ import com.nutrisoft.core.component.appointment.domain.Appointment;
 import com.nutrisoft.core.shared.mapper.ValueObjectMapper;
 import com.nutrisoft.infrastructure.persistence.jpa.appointment.entity.AppointmentEntity;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 /**
  * Mapper for converting JPA Entities to Domain Objects.
@@ -20,11 +19,7 @@ import org.mapstruct.Mapping;
 @Mapper(uses = ValueObjectMapper.class)
 public interface AppointmentMapper {
 
-  @Mapping(
-      target = "virtualMeetingLink",
-      expression = "java(URI.create(entity.getVirtualMeetingLink()))")
   Appointment toDomain(AppointmentEntity entity);
 
-  @Mapping(target = "virtualMeetingLink", expression = "java(appointment.getVirtualMeetingLink().toString())")
   AppointmentEntity toEntity(Appointment appointment);
 }
