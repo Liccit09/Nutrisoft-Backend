@@ -1,0 +1,91 @@
+### Nutrisoft Backend - Appointments API REST Client Tests
+### Este archivo permite probar todos los endpoints del API de Appointments usando el plugin REST Client de VSCode
+
+### ====== VARIABLES ======
+@baseUrl = http://localhost:8080/api
+@appointmentId = 850e8400-e29b-41d4-a716-446655440002
+@patientId = 550e8400-e29b-41d4-a716-446655440001
+@professionalId = 650e8400-e29b-41d4-a716-446655440001
+@serviceId = 750e8400-e29b-41d4-a716-446655440001
+
+
+
+### ====== GET ENDPOINTS ======
+
+### 1. Obtener todos los appointments
+GET {{baseUrl}}/v1/appointments
+Accept: application/json
+
+### 2. Obtener un appointment por ID
+GET {{baseUrl}}/v1/appointments/{{appointmentId}}
+Accept: application/json
+
+### 3. Listar appointments de un paciente específico
+GET {{baseUrl}}/v1/appointments/patient/{{patientId}}
+Accept: application/json
+
+### 4. Listar appointments de un profesional específico
+GET {{baseUrl}}/v1/appointments/professional/{{professionalId}}
+Accept: application/json
+
+
+
+### ====== POST ENDPOINTS ======
+
+### 5. Crear un nuevo appointment
+POST {{baseUrl}}/v1/appointments
+Content-Type: application/json
+Accept: application/json
+
+{
+  "patientId": "550e8400-e29b-41d4-a716-446655440003",
+  "professionalId": "650e8400-e29b-41d4-a716-446655440004",
+  "serviceId": "750e8400-e29b-41d4-a716-446655440004",
+  "startTime": "2026-05-15T10:30:00Z",
+  "mode": "IN_PERSON"
+}
+
+### 6. Confirmar un appointment
+POST {{baseUrl}}/v1/appointments/{{appointmentId}}/confirm
+Accept: application/json
+
+### 7. Completar un appointment
+POST {{baseUrl}}/v1/appointments/{{appointmentId}}/complete
+Accept: application/json
+
+### 8. Cancelar un appointment
+POST {{baseUrl}}/v1/appointments/{{appointmentId}}/cancel
+Accept: application/json
+
+### 9. Marcar un appointment como no-show
+POST {{baseUrl}}/v1/appointments/{{appointmentId}}/no-show
+Accept: application/json
+
+### ====== PUT ENDPOINTS ======
+
+### 10. Reagendar un appointment
+PUT {{baseUrl}}/v1/appointments/{{appointmentId}}/reschedule
+Content-Type: application/json
+Accept: application/json
+
+{
+  "startTime": "2026-05-20T14:00:00Z"
+}
+
+### 11. Registrar link de reunión virtual
+PUT {{baseUrl}}/v1/appointments/{{appointmentId}}/virtual-link
+Content-Type: application/json
+Accept: application/json
+
+{
+  "virtualMeetingLink": "https://meet.example.com/room123"
+}
+
+### ====== NOTAS ======
+# 1. Reemplaza los IDs de ejemplo con IDs válidos de tu base de datos
+# 2. Asegúrate de que el servidor esté ejecutándose en http://localhost:8080/api
+# 3. Ajusta la URL base (@baseUrl) si el servidor está en un puerto diferente
+# 4. Usa Ctrl+Alt+R (Windows) o Cmd+Option+R (Mac) para ejecutar la petición actual
+# 5. Los tiempos (startTime) deben estar en formato ISO 8601 (ej: 2026-05-15T10:30:00Z)
+# 6. El campo "mode" puede ser: "IN_PERSON" o "VIRTUAL"
+
