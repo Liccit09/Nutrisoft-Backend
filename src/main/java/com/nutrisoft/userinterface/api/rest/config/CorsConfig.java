@@ -1,4 +1,4 @@
-package com.nutrisoft.infrastructure.config;
+package com.nutrisoft.userinterface.api.rest.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
