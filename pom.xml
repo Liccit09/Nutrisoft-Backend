@@ -88,6 +88,62 @@
             <artifactId>openapi-generator-maven-plugin</artifactId>
             <version>7.2.0</version>
         </dependency>
+
+        <!-- Spring Security -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!-- JWT (jjwt) -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.12.3</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.12.3</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.12.3</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Spring Mail for Password Recovery -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
+        <!-- Apache Commons Lang -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.14.0</version>
+        </dependency>
+
+        <!-- Jackson DataType for Java 8+ Time API (OffsetDateTime, LocalDateTime, etc.) -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -192,10 +248,161 @@
                             </configOptions>
                         </configuration>
                     </execution>
+
+                    <!-- Second execution: Auth API generation -->
+                    <execution>
+                        <id>auth-api-generation</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <!-- OpenAPI Specification File for Auth API -->
+                            <inputSpec>${project.basedir}/src/main/resources/openapi/auth-api-v1.yaml</inputSpec>
+
+                            <!-- Spring Framework Code Generator -->
+                            <generatorName>spring</generatorName>
+
+                            <!-- Output Package for Generated API Interfaces -->
+                            <!-- Located in: UserInterface\API\Rest\Auth\Generated -->
+                            <apiPackage>com.nutrisoft.userinterface.api.rest.auth.generated</apiPackage>
+
+                            <!-- Output Package for Generated Model/DTO Classes -->
+                            <modelPackage>com.nutrisoft.userinterface.api.rest.auth.generated.model</modelPackage>
+
+                            <!-- Generate only interface (no implementation) -->
+                            <supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
+
+                            <!-- Generator Configuration Options -->
+                            <configOptions>
+                                <!-- Use Spring Boot 3 features -->
+                                <useSpringBoot3>true</useSpringBoot3>
+
+                                <!-- Generate only interface, not implementation -->
+                                <interfaceOnly>true</interfaceOnly>
+
+                                <!-- Use Jakarta EE (Spring Boot 3+) -->
+                                <useJakartaEe>true</useJakartaEe>
+
+                                <!-- Skip generation if spec hasn't changed -->
+                                <skipIfSpecIsUnchanged>true</skipIfSpecIsUnchanged>
+
+                                <!-- Date/Time library -->
+                                <dateLibrary>java8</dateLibrary>
+
+                                <!-- JSON serialization library -->
+                                <serializationLibrary>jackson</serializationLibrary>
+
+                                <!-- Use Lombok for generated models -->
+                                <useLombok>true</useLombok>
+                                <openApiNullable>false</openApiNullable>
+                                <useTags>true</useTags>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+
+                    <!-- Third execution: Patient API generation -->
+                    <execution>
+                        <id>patient-api-generation</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <!-- OpenAPI Specification File for Patient API -->
+                            <inputSpec>${project.basedir}/src/main/resources/openapi/patient-api-v1.yaml</inputSpec>
+
+                            <!-- Spring Framework Code Generator -->
+                            <generatorName>spring</generatorName>
+
+                            <!-- Output Package for Generated API Interfaces -->
+                            <!-- Located in: UserInterface\API\Rest\Patient\Generated -->
+                            <apiPackage>com.nutrisoft.userinterface.api.rest.patient.generated</apiPackage>
+
+                            <!-- Output Package for Generated Model/DTO Classes -->
+                            <modelPackage>com.nutrisoft.userinterface.api.rest.patient.generated.model</modelPackage>
+
+                            <!-- Generate only interface (no implementation) -->
+                            <supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
+
+                            <!-- Generator Configuration Options -->
+                            <configOptions>
+                                <!-- Use Spring Boot 3 features -->
+                                <useSpringBoot3>true</useSpringBoot3>
+
+                                <!-- Generate only interface, not implementation -->
+                                <interfaceOnly>true</interfaceOnly>
+
+                                <!-- Use Jakarta EE (Spring Boot 3+) -->
+                                <useJakartaEe>true</useJakartaEe>
+
+                                <!-- Skip generation if spec hasn't changed -->
+                                <skipIfSpecIsUnchanged>true</skipIfSpecIsUnchanged>
+
+                                <!-- Date/Time library -->
+                                <dateLibrary>java8</dateLibrary>
+
+                                <!-- JSON serialization library -->
+                                <serializationLibrary>jackson</serializationLibrary>
+
+                                <!-- Use Lombok for generated models -->
+                                <useLombok>true</useLombok>
+                                <openApiNullable>false</openApiNullable>
+                                <useTags>true</useTags>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+
+                    <!-- Fourth execution: Professional API generation -->
+                    <execution>
+                        <id>professional-api-generation</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <!-- OpenAPI Specification File for Professional API -->
+                            <inputSpec>${project.basedir}/src/main/resources/openapi/professional-api-v1.yaml</inputSpec>
+
+                            <!-- Spring Framework Code Generator -->
+                            <generatorName>spring</generatorName>
+
+                            <!-- Output Package for Generated API Interfaces -->
+                            <!-- Located in: UserInterface\API\Rest\Professional\Generated -->
+                            <apiPackage>com.nutrisoft.userinterface.api.rest.professional.generated</apiPackage>
+
+                            <!-- Output Package for Generated Model/DTO Classes -->
+                            <modelPackage>com.nutrisoft.userinterface.api.rest.professional.generated.model</modelPackage>
+
+                            <!-- Generate only interface (no implementation) -->
+                            <supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
+
+                            <!-- Generator Configuration Options -->
+                            <configOptions>
+                                <!-- Use Spring Boot 3 features -->
+                                <useSpringBoot3>true</useSpringBoot3>
+
+                                <!-- Generate only interface, not implementation -->
+                                <interfaceOnly>true</interfaceOnly>
+
+                                <!-- Use Jakarta EE (Spring Boot 3+) -->
+                                <useJakartaEe>true</useJakartaEe>
+
+                                <!-- Skip generation if spec hasn't changed -->
+                                <skipIfSpecIsUnchanged>true</skipIfSpecIsUnchanged>
+
+                                <!-- Date/Time library -->
+                                <dateLibrary>java8</dateLibrary>
+
+                                <!-- JSON serialization library -->
+                                <serializationLibrary>jackson</serializationLibrary>
+
+                                <!-- Use Lombok for generated models -->
+                                <useLombok>true</useLombok>
+                                <openApiNullable>false</openApiNullable>
+                                <useTags>true</useTags>
+                            </configOptions>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
-
 </project>
-

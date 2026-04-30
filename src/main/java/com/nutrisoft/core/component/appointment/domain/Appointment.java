@@ -61,7 +61,6 @@ public class Appointment extends AggregateRoot<AppointmentId> {
 
   private void validate() {
     assertVirtualModeIsValid();
-    assertStartTimeIsInFuture();
   }
 
   private void assertVirtualModeIsValid() {
@@ -71,7 +70,7 @@ public class Appointment extends AggregateRoot<AppointmentId> {
     }
   }
 
-  private void assertStartTimeIsInFuture() {
+  private static void assertStartTimeIsInFuture(final LocalDateTime startTime) {
     if (startTime.isBefore(LocalDateTime.now())) {
       throw new IllegalStateException("Appointment start time must be in the future");
     }
@@ -84,11 +83,12 @@ public class Appointment extends AggregateRoot<AppointmentId> {
       @NonNull final LocalDateTime startTime,
       final AppointmentMode mode,
       final String virtualMeetingLink) {
+    assertStartTimeIsInFuture(startTime);
 
     final var now = LocalDateTime.now();
     final var appointmentId = AppointmentId.create();
 
-    Appointment appointment =
+    final var appointment =
         new Appointment(
             appointmentId,
             patientId,
@@ -163,6 +163,8 @@ public class Appointment extends AggregateRoot<AppointmentId> {
    * no-show.
    */
   public void reschedule(final LocalDateTime newStartTime) {
+    assertStartTimeIsInFuture(newStartTime);
+
     if (!status.canBeUpdated()) {
       throw new IllegalStateException("Cannot reschedule appointment with status: " + status);
     }

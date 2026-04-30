@@ -6,6 +6,7 @@ import java.time.ZoneId;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -23,6 +24,18 @@ import org.springframework.web.context.request.WebRequest;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+  /** Handle JSON deserialization errors. Returns 400 Bad Request. */
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
+      final HttpMessageNotReadableException ex, final WebRequest request) {
+    log.warn("JSON parse error: {}", ex.getMessage());
+    
+    String message = "Invalid request format. " + ex.getMostSpecificCause().getMessage();
+
+    return ResponseEntity.badRequest()
+        .body(buildErrorResponse(HttpStatus.BAD_REQUEST, message, request));
+  }
 
   /** Handle IllegalArgumentException (Invalid input). Returns 400 Bad Request. */
   @ExceptionHandler(IllegalArgumentException.class)

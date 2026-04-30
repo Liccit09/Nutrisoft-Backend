@@ -1,3 +1,8 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
 spring:
   application:
     name: nutrisoft-backend
@@ -10,7 +15,9 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      # ddl-auto: update preserves data between restarts
+      # Options: create (recreate, loses data), create-drop, update (preserves), validate, none
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -25,11 +32,36 @@ spring:
     default-property-inclusion: non_null
     serialization:
       write-dates-as-timestamps: false
+      indent-output: false
+    deserialization:
+      fail-on-unknown-properties: false
+      adjust-dates-to-context-time-zone: false
 
-server:
-  port: 8080
-  servlet:
-    context-path: /api
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:your-email@gmail.com}
+    password: ${MAIL_PASSWORD:your-app-password}
+    from: noreply@nutrisoft.com
+    from-name: Nutrisoft
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+# JWT Configuration
+app:
+  jwtSecret: ${JWT_SECRET:nutrisoft-secret-key-for-jwt-token-generation-and-validation-purpose-only}
+  jwtExpirationMs: 86400000  # 24 hours
+  resetTokenExpirationHours: 24
+  frontend:
+    baseUrl: ${FRONTEND_BASE_URL:http://localhost:3000}
 
 logging:
   level:

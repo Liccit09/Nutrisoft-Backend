@@ -1,0 +1,156 @@
+openapi: 3.0.0
+info:
+  title: Nutrisoft Patient API
+  description: API for patient management and patient-specific operations
+  version: 1.0.0
+  contact:
+    name: Nutrisoft Support
+    email: support@nutrisoft.com
+  license:
+    name: Apache 2.0
+
+servers:
+  - url: http://localhost:8080/api
+    description: Development server
+
+tags:
+  - name: Patients
+    description: Patient registration and management operations
+
+paths:
+  /v1/patients/register:
+    post:
+      summary: Register a new patient
+      description: Creates a new patient account with email and password
+      operationId: registerPatient
+      tags:
+        - Patients
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterPatientRequest'
+      responses:
+        '201':
+          description: Patient registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientAuthResponse'
+        '400':
+          description: Invalid input or validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Patient already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    RegisterPatientRequest:
+      type: object
+      required:
+        - email
+        - password
+        - firstName
+        - lastName
+      properties:
+        email:
+          type: string
+          format: email
+          description: Patient email address
+          example: patient@example.com
+        phoneNumber:
+          type: string
+          pattern: '^\+?[1-9]\d{1,14}$'
+          description: Patient phone number in E.164 format (optional)
+          example: +1234567890
+        password:
+          type: string
+          format: password
+          minLength: 8
+          description: Patient password (minimum 8 characters)
+          example: SecurePassword123!
+        firstName:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Patient first name
+          example: Juan
+        lastName:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Patient last name
+          example: García
+
+    PatientAuthResponse:
+      type: object
+      required:
+        - token
+        - type
+        - email
+        - role
+      properties:
+        token:
+          type: string
+          description: JWT Bearer token for authentication
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type:
+          type: string
+          default: Bearer
+          description: Token type
+          example: Bearer
+        aggregateId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Aggregate ID of the patient
+          example: 550e8400-e29b-41d4-a716-446655440000
+        email:
+          type: string
+          format: email
+          description: Patient email
+          example: patient@example.com
+        role:
+          type: string
+          enum:
+            - PATIENT
+          description: Patient role
+          example: PATIENT
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error type or title
+          example: Registration failed
+        message:
+          type: string
+          description: Detailed error message
+          example: Email already exists
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT Bearer token
+

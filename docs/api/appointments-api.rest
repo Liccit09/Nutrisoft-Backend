@@ -3,10 +3,11 @@
 
 ### ====== VARIABLES ======
 @baseUrl = http://localhost:8080/api
-@appointmentId = 850e8400-e29b-41d4-a716-446655440002
-@patientId = 550e8400-e29b-41d4-a716-446655440001
+@appointmentId = fb3fd32e-245d-4ef6-81f1-2e91818d4b1a
+@patientId = 7b2550fe-49a9-440d-91ce-fa2f494060aa
 @professionalId = 650e8400-e29b-41d4-a716-446655440001
 @serviceId = 750e8400-e29b-41d4-a716-446655440001
+@token = eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqdWFuQGV4YW1wbGUuY29tIiwiZW1haWwiOiJqdWFuQGV4YW1wbGUuY29tIiwicm9sZSI6IlBBVElFTlQiLCJpYXQiOjE3Nzc0OTYxNzcsImV4cCI6MTc3NzU4MjU3N30.-adxn0S1XJ2W7xT88_1VIP3d5-T5Vu813p1Se3tVjNpum5Er0iZBPyGSrH4RefXtBVhIwXHE5X6zNCqh__2ehQ
 
 
 
@@ -15,18 +16,22 @@
 ### 1. Obtener todos los appointments
 GET {{baseUrl}}/v1/appointments
 Accept: application/json
+Authorization: Bearer {{token}}
 
 ### 2. Obtener un appointment por ID
 GET {{baseUrl}}/v1/appointments/{{appointmentId}}
 Accept: application/json
+Authorization: Bearer {{token}}
 
 ### 3. Listar appointments de un paciente específico
 GET {{baseUrl}}/v1/appointments/patient/{{patientId}}
 Accept: application/json
+Authorization: Bearer {{token}}
 
 ### 4. Listar appointments de un profesional específico
 GET {{baseUrl}}/v1/appointments/professional/{{professionalId}}
 Accept: application/json
+Authorization: Bearer {{token}}
 
 
 
@@ -36,11 +41,12 @@ Accept: application/json
 POST {{baseUrl}}/v1/appointments
 Content-Type: application/json
 Accept: application/json
+Authorization: Bearer {{token}}
 
 {
-  "patientId": "550e8400-e29b-41d4-a716-446655440003",
-  "professionalId": "650e8400-e29b-41d4-a716-446655440004",
-  "serviceId": "750e8400-e29b-41d4-a716-446655440004",
+  "patientId": "{{patientId}}",
+  "professionalId": "{{professionalId}}",
+  "serviceId": "{{serviceId}}",
   "startTime": "2026-05-15T10:30:00Z",
   "mode": "IN_PERSON"
 }
@@ -48,18 +54,22 @@ Accept: application/json
 ### 6. Confirmar un appointment
 POST {{baseUrl}}/v1/appointments/{{appointmentId}}/confirm
 Accept: application/json
+Authorization: Bearer {{token}}
 
 ### 7. Completar un appointment
 POST {{baseUrl}}/v1/appointments/{{appointmentId}}/complete
 Accept: application/json
+Authorization: Bearer {{token}}
 
 ### 8. Cancelar un appointment
 POST {{baseUrl}}/v1/appointments/{{appointmentId}}/cancel
 Accept: application/json
+Authorization: Bearer {{token}}
 
 ### 9. Marcar un appointment como no-show
 POST {{baseUrl}}/v1/appointments/{{appointmentId}}/no-show
 Accept: application/json
+Authorization: Bearer {{token}}
 
 ### ====== PUT ENDPOINTS ======
 
@@ -67,6 +77,7 @@ Accept: application/json
 PUT {{baseUrl}}/v1/appointments/{{appointmentId}}/reschedule
 Content-Type: application/json
 Accept: application/json
+Authorization: Bearer {{token}}
 
 {
   "startTime": "2026-05-20T14:00:00Z"
@@ -76,6 +87,7 @@ Accept: application/json
 PUT {{baseUrl}}/v1/appointments/{{appointmentId}}/virtual-link
 Content-Type: application/json
 Accept: application/json
+Authorization: Bearer {{token}}
 
 {
   "virtualMeetingLink": "https://meet.example.com/room123"

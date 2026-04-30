@@ -1,0 +1,129 @@
+### Nutrisoft Backend - Patient API REST Client Tests
+### Este archivo permite probar todos los endpoints del API de Patients usando el plugin REST Client de VSCode
+### Especificación OpenAPI: /src/main/resources/openapi/patient-api-v1.yaml
+
+### ====== VARIABLES ======
+@baseUrl = http://localhost:8080/api
+@patientId = 550e8400-e29b-41d4-a716-446655440001
+
+
+
+### ====== POST ENDPOINTS ======
+
+### 1. Registrar un nuevo paciente (sin autenticación)
+POST {{baseUrl}}/v1/patients/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "juan@example.com",
+  "phoneNumber": "+1234567890",
+  "password": "SecurePassword123!",
+  "firstName": "Juan",
+  "lastName": "García"
+}
+
+### 2. Registrar otro paciente de prueba
+POST {{baseUrl}}/v1/patients/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "maria@example.com",
+  "password": "SecurePassword456!",
+  "firstName": "María",
+  "lastName": "López"
+}
+
+### 3. Registrar paciente con email duplicado (esperado: 409 Conflict)
+POST {{baseUrl}}/v1/patients/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "juan@example.com",
+  "password": "DifferentPassword123!",
+  "firstName": "Juan Duplicate",
+  "lastName": "García"
+}
+
+### 4. Registrar paciente con email inválido (esperado: 400 Bad Request)
+POST {{baseUrl}}/v1/patients/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "invalid-email",
+  "password": "SecurePassword123!",
+  "firstName": "Invalid",
+  "lastName": "Email"
+}
+
+### 5. Registrar paciente con password muy corto (esperado: 400 Bad Request)
+POST {{baseUrl}}/v1/patients/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "test@example.com",
+  "password": "short",
+  "firstName": "Test",
+  "lastName": "User"
+}
+
+### 6. Registrar paciente sin firstName (esperado: 400 Bad Request)
+POST {{baseUrl}}/v1/patients/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "test2@example.com",
+  "password": "SecurePassword123!",
+  "firstName": "",
+  "lastName": "User"
+}
+
+
+
+### ====== RESPUESTAS ESPERADAS ======
+
+# ✅ 201 Created - Registro exitoso:
+# {
+#   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+#   "type": "Bearer",
+#   "aggregateId": "550e8400-e29b-41d4-a716-446655440001",
+#   "email": "juan@example.com",
+#   "role": "PATIENT"
+# }
+
+# ❌ 400 Bad Request - Validación fallida:
+# {
+#   "error": "Validation failed",
+#   "message": "Email should be valid"
+# }
+
+# ❌ 409 Conflict - Email duplicado:
+# {
+#   "error": "Validation failed",
+#   "message": "Email already exists"
+# }
+
+# ❌ 500 Internal Server Error - Error inesperado:
+# {
+#   "error": "Internal server error",
+#   "message": "An unexpected error occurred"
+# }
+
+
+
+### ====== NOTAS ======
+# 1. Patient registration NO requiere autenticación (endpoint público)
+# 2. El email debe ser único en el sistema
+# 3. La contraseña debe tener mínimo 8 caracteres
+# 4. firstName y lastName son requeridos (no pueden estar vacíos)
+# 5. Reemplaza los emails y datos de prueba según tus necesidades
+# 6. El rol del usuario registrado es siempre "PATIENT"
+# 7. El token obtenido se puede usar para autenticar en otros endpoints
+# 8. Ver auth-api.rest para hacer login después del registro
+# 9. Ver appointments-api.rest para crear appointments una vez autenticado
+

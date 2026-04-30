@@ -1,0 +1,219 @@
+### Nutrisoft Backend - Professional API REST Client Tests
+### Este archivo permite probar todos los endpoints del API de Professionals usando el plugin REST Client de VSCode
+### Especificación OpenAPI: /src/main/resources/openapi/professional-api-v1.yaml
+
+### ====== VARIABLES ======
+@baseUrl = http://localhost:8080/api
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.YOUR_ADMIN_TOKEN_HERE
+@professionalId = 650e8400-e29b-41d4-a716-446655440001
+
+
+
+### ====== POST ENDPOINTS ======
+
+### 1. Registrar un nuevo profesional (REQUIERE AUTENTICACIÓN + ROL ADMIN)
+POST {{baseUrl}}/v1/professionals/register
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "email": "doctor@hospital.com",
+  "password": "SecurePassword123!",
+  "firstName": "Dr. Carlos",
+  "lastName": "López",
+  "licenseNumber": "LIC-123456",
+  "specialization": "Nutrición Deportiva"
+}
+
+### 2. Registrar otro profesional de prueba (REQUIERE AUTENTICACIÓN + ROL ADMIN)
+POST {{baseUrl}}/v1/professionals/register
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "email": "nutriologist@clinic.com",
+  "password": "SecurePassword456!",
+  "firstName": "Dra. Ana",
+  "lastName": "García",
+  "licenseNumber": "LIC-789012",
+  "specialization": "Nutrición Clínica"
+}
+
+### 3. Registrar profesional con email duplicado (esperado: 409 Conflict)
+POST {{baseUrl}}/v1/professionals/register
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "email": "doctor@hospital.com",
+  "password": "DifferentPassword123!",
+  "firstName": "Dr. Carlos Duplicate",
+  "lastName": "López",
+  "licenseNumber": "LIC-999999",
+  "specialization": "Otra Especialidad"
+}
+
+### 4. Registrar profesional con email inválido (esperado: 400 Bad Request)
+POST {{baseUrl}}/v1/professionals/register
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "email": "invalid-email",
+  "password": "SecurePassword123!",
+  "firstName": "Dr. Invalid",
+  "lastName": "Email",
+  "licenseNumber": "LIC-111111",
+  "specialization": "Nutrición"
+}
+
+{
+  "email": "invalid-email",
+  "password": "SecurePassword123!",
+  "firstName": "Dr. Invalid",
+  "lastName": "Email",
+  "licenseNumber": "LIC-111111",
+  "specialization": "Nutrición"
+}
+
+### 5. Registrar profesional sin licenseNumber (esperado: 400 Bad Request)
+POST {{baseUrl}}/v1/professionals/register
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "email": "nolicense@hospital.com",
+  "password": "SecurePassword123!",
+  "firstName": "Dr. NoLicense",
+  "lastName": "Smith",
+  "licenseNumber": "",
+  "specialization": "Nutrición"
+}
+
+### 6. Registrar profesional sin specialization (esperado: 400 Bad Request)
+POST {{baseUrl}}/v1/professionals/register
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "email": "nospecialty@hospital.com",
+  "password": "SecurePassword123!",
+  "firstName": "Dr. NoSpecialty",
+  "lastName": "Johnson",
+  "licenseNumber": "LIC-333333",
+  "specialization": ""
+}
+
+### 7. Registrar profesional con password muy corto (esperado: 400 Bad Request)
+POST {{baseUrl}}/v1/professionals/register
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "email": "shortpass@hospital.com",
+  "password": "short",
+  "firstName": "Dr. ShortPass",
+  "lastName": "Brown",
+  "licenseNumber": "LIC-444444",
+  "specialization": "Nutrición"
+}
+
+### 8. Registrar profesional SIN autenticación (esperado: 401 Unauthorized)
+POST {{baseUrl}}/v1/professionals/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "unauthorized@hospital.com",
+  "password": "SecurePassword123!",
+  "firstName": "Dr. Unauthorized",
+  "lastName": "User",
+  "licenseNumber": "LIC-555555",
+  "specialization": "Nutrición"
+}
+
+### 9. Registrar profesional con token de PATIENT (esperado: 403 Forbidden)
+POST {{baseUrl}}/v1/professionals/register
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "email": "notadmin@hospital.com",
+  "password": "SecurePassword123!",
+  "firstName": "Dr. NotAdmin",
+  "lastName": "User",
+  "licenseNumber": "LIC-666666",
+  "specialization": "Nutrición"
+}
+
+
+
+### ====== RESPUESTAS ESPERADAS ======
+
+# ✅ 201 Created - Registro exitoso:
+# {
+#   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+#   "type": "Bearer",
+#   "aggregateId": "650e8400-e29b-41d4-a716-446655440001",
+#   "email": "doctor@hospital.com",
+#   "role": "PROFESSIONAL"
+# }
+
+# ❌ 400 Bad Request - Validación fallida:
+# {
+#   "error": "Validation failed",
+#   "message": "License number is required"
+# }
+
+# ❌ 401 Unauthorized - Sin autenticación:
+# {
+#   "error": "Unauthorized",
+#   "message": "Missing or invalid token"
+# }
+
+# ❌ 403 Forbidden - Rol insuficiente:
+# {
+#   "error": "Forbidden",
+#   "message": "Access denied - ADMIN role required"
+# }
+
+# ❌ 409 Conflict - Email duplicado:
+# {
+#   "error": "Validation failed",
+#   "message": "Email already exists"
+# }
+
+# ❌ 500 Internal Server Error - Error inesperado:
+# {
+#   "error": "Internal server error",
+#   "message": "An unexpected error occurred"
+# }
+
+
+
+### ====== NOTAS ======
+# 1. Professional registration REQUIERE autenticación (endpoint protegido)
+# 2. Solo usuarios con rol ADMIN pueden registrar profesionales
+# 3. Para obtener un token ADMIN, primero ejecuta login en auth-api.rest con credenciales admin
+# 4. Reemplaza {{adminToken}} con un token JWT válido de usuario ADMIN
+# 5. Todos los campos son requeridos: email, password, firstName, lastName, licenseNumber, specialization
+# 6. El email debe ser único en el sistema
+# 7. La contraseña debe tener mínimo 8 caracteres
+# 8. licenseNumber es requerido y debe ser único
+# 9. specialization es requerido (ej: "Nutrición Deportiva", "Nutrición Clínica", etc.)
+# 10. firstName y lastName deben tener entre 1 y 100 caracteres
+# 11. licenseNumber y specialization deben tener entre 1 y 100 caracteres
+# 12. Reemplaza los emails y datos de prueba según tus necesidades
+# 13. El rol del usuario registrado es siempre "PROFESSIONAL"
+# 14. El token obtenido se puede usar para autenticar en otros endpoints
+# 15. Ver auth-api.rest para hacer login después del registro
+# 16. Ver appointments-api.rest para crear appointments una vez autenticado
+

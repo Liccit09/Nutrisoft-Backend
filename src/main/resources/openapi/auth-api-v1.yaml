@@ -1,0 +1,141 @@
+openapi: 3.0.0
+info:
+  title: Nutrisoft Authentication API
+  description: API for user authentication and authorization (patients, professionals)
+  version: 1.0.0
+  contact:
+    name: Nutrisoft Support
+    email: support@nutrisoft.com
+  license:
+    name: Apache 2.0
+
+servers:
+  - url: http://localhost:8080/api
+    description: Development server
+
+tags:
+  - name: Authentication
+    description: User authentication and registration operations (professionals only)
+
+paths:
+  /v1/auth/login:
+    post:
+      summary: Login user
+      description: Authenticates a user and returns a JWT token
+      operationId: login
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful, JWT token returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - invalid credentials or inactive account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: User email address
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          description: User password
+          example: SecurePassword123!
+
+    AuthResponse:
+      type: object
+      required:
+        - token
+        - type
+        - email
+        - role
+      properties:
+        token:
+          type: string
+          description: JWT Bearer token for authentication
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type:
+          type: string
+          default: Bearer
+          description: Token type
+          example: Bearer
+        aggregateId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Aggregate ID of the professional
+          example: 550e8400-e29b-41d4-a716-446655440000
+        email:
+          type: string
+          format: email
+          description: User email
+          example: user@example.com
+        role:
+          type: string
+          enum:
+            - PATIENT
+            - PROFESSIONAL
+            - ADMIN
+          description: User role
+          example: PROFESSIONAL
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error type or title
+          example: Authentication failed
+        message:
+          type: string
+          description: Detailed error message
+          example: Invalid email or password
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT Bearer token
+
+security:
+  - bearerAuth: []
+

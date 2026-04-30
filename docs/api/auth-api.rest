@@ -1,0 +1,67 @@
+### Nutrisoft Backend - Authentication API REST Client Tests
+### Este archivo permite probar todos los endpoints del API de Authentication usando el plugin REST Client de VSCode
+### Especificación OpenAPI: /src/main/resources/openapi/auth-api-v1.yaml
+
+### ====== VARIABLES ======
+@baseUrl = http://localhost:8080/api
+@patientToken =
+@professionalToken =
+@adminToken =
+
+
+
+### ====== LOGIN ENDPOINT ======
+
+### 1. Login - Paciente
+POST {{baseUrl}}/v1/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "patient@example.com",
+  "password": "SecurePassword123!"
+}
+
+### 2. Login - Profesional
+POST {{baseUrl}}/v1/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "professional@hospital.com",
+  "password": "SecurePassword123!"
+}
+
+### 3. Login - Admin
+POST {{baseUrl}}/v1/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "admin@nutrisoft.com",
+  "password": "AdminPassword123!"
+}
+
+
+
+### ====== NOTAS ======
+# 1. El endpoint de login autentifica a cualquier usuario (PATIENT, PROFESSIONAL, ADMIN)
+# 2. Reemplaza los emails y passwords con credenciales válidas de tu base de datos
+# 3. La respuesta incluye:
+#    - token: JWT Bearer token para usar en otros endpoints
+#    - type: "Bearer"
+#    - aggregateId: UUID del usuario
+#    - email: correo del usuario
+#    - role: rol del usuario (PATIENT, PROFESSIONAL, ADMIN)
+# 4. Usa el token obtenido en la variable @token para autenticar otros endpoints
+# 5. Los tokens JWT expiran después del tiempo configurado en la aplicación
+# 6. Ejemplo de respuesta exitosa (200 OK):
+#    {
+#      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+#      "type": "Bearer",
+#      "aggregateId": "550e8400-e29b-41d4-a716-446655440000",
+#      "email": "patient@example.com",
+#      "role": "PATIENT"
+#    }
+# 7. Ver patient-api.rest y professional-api.rest para registrar nuevos usuarios
+
