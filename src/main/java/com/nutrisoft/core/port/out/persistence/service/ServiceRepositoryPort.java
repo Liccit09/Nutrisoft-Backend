@@ -1,6 +1,7 @@
 package com.nutrisoft.core.port.out.persistence.service;
 
 import com.nutrisoft.core.component.service.domain.Service;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,4 +23,7 @@ public interface ServiceRepositoryPort {
 
   /** Check if a service exists. */
   boolean exists(UUID id);
+
+  /** Find all services. */
+  List<Service> findAll();
 }

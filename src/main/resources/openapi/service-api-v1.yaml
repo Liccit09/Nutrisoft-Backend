@@ -1,0 +1,95 @@
+openapi: 3.0.0
+info:
+  title: Nutrisoft Service API
+  description: API for managing nutrition services
+  version: 1.0.0
+  contact:
+    name: Nutrisoft Support
+    email: support@nutrisoft.com
+
+servers:
+  - url: http://localhost:8080/api
+    description: Development server
+
+tags:
+  - name: Services
+    description: Operations related to service management
+
+paths:
+  /v1/services:
+    get:
+      summary: List all services
+      description: Retrieve all available nutrition services
+      operationId: listServices
+      tags:
+        - Services
+      security: []
+      responses:
+        '200':
+          description: Services retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ServiceResponse:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - price
+        - durationInMinutes
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the service
+          example: 123e4567-e89b-12d3-a456-426614174000
+        name:
+          type: string
+          description: Service name
+          example: Nutritional Consultation
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          description: Service description
+          example: One-on-one nutritional consultation and personalized diet plan
+        price:
+          type: number
+          format: decimal
+          description: Service price
+          example: 150.00
+          minimum: 0
+        durationInMinutes:
+          type: integer
+          description: Service duration in minutes
+          example: 60
+          minimum: 1
+
+    ErrorResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Error message
+        code:
+          type: string
+          description: Error code
+        details:
+          type: object
+          description: Additional error details
+

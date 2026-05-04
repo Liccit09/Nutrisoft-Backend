@@ -57,7 +57,7 @@ public class SecurityConfig {
     private static final String ENDPOINT_PROFILE = "/v1/profile";
     private static final String ENDPOINT_ADMIN = "/v1/admin/**";
     private static final String ENDPOINT_USERS = "/v1/users/**";
-    private static final String ENDPOINT_SERVICES = "/v1/services/**";
+    private static final String ENDPOINT_SERVICES = "/v1/services";
     
     // Swagger/Documentation routes
     private static final String ENDPOINT_SWAGGER_UI = "/swagger-ui/**";
@@ -108,6 +108,9 @@ public class SecurityConfig {
                     
                     // Patient API - Registration
                     .requestMatchers("POST", ENDPOINT_PATIENT_REGISTER).permitAll()
+                    
+                    // Service API - List all services (GET only)
+                    .requestMatchers("GET", ENDPOINT_SERVICES).permitAll()
                     
                     // Swagger UI and API Documentation - ALL PUBLIC
                     .requestMatchers(ENDPOINT_SWAGGER_UI).permitAll()
@@ -160,7 +163,6 @@ public class SecurityConfig {
                     // ========== ADMIN ENDPOINTS ==========
                     .requestMatchers(ENDPOINT_ADMIN).hasRole(ROLE_ADMIN)
                     .requestMatchers(ENDPOINT_USERS).hasRole(ROLE_ADMIN)
-                    .requestMatchers(ENDPOINT_SERVICES).hasRole(ROLE_ADMIN)
 
                     // ========== PROFILE ENDPOINTS ==========
                     // Any authenticated user can access their profile

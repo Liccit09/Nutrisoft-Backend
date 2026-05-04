@@ -407,6 +407,57 @@
                             </configOptions>
                         </configuration>
                     </execution>
+
+                    <!-- Fifth execution: Service API generation -->
+                    <execution>
+                        <id>service-api-generation</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <!-- OpenAPI Specification File for Service API -->
+                            <inputSpec>${project.basedir}/src/main/resources/openapi/service-api-v1.yaml</inputSpec>
+
+                            <!-- Spring Framework Code Generator -->
+                            <generatorName>spring</generatorName>
+
+                            <!-- Output Package for Generated API Interfaces -->
+                            <!-- Located in: UserInterface\API\Rest\Service\Generated -->
+                            <apiPackage>com.nutrisoft.userinterface.api.rest.service.generated</apiPackage>
+
+                            <!-- Output Package for Generated Model/DTO Classes -->
+                            <modelPackage>com.nutrisoft.userinterface.api.rest.service.generated.model</modelPackage>
+
+                            <!-- Generate only interface (no implementation) -->
+                            <supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
+
+                            <!-- Generator Configuration Options -->
+                            <configOptions>
+                                <!-- Use Spring Boot 3 features -->
+                                <useSpringBoot3>true</useSpringBoot3>
+
+                                <!-- Generate only interface, not implementation -->
+                                <interfaceOnly>true</interfaceOnly>
+
+                                <!-- Use Jakarta EE (Spring Boot 3+) -->
+                                <useJakartaEe>true</useJakartaEe>
+
+                                <!-- Skip generation if spec hasn't changed -->
+                                <skipIfSpecIsUnchanged>true</skipIfSpecIsUnchanged>
+
+                                <!-- Date/Time library -->
+                                <dateLibrary>java8</dateLibrary>
+
+                                <!-- JSON serialization library -->
+                                <serializationLibrary>jackson</serializationLibrary>
+
+                                <!-- Use Lombok for generated models -->
+                                <useLombok>true</useLombok>
+                                <openApiNullable>false</openApiNullable>
+                                <useTags>true</useTags>
+                            </configOptions>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>

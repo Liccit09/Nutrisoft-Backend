@@ -4,6 +4,7 @@ import com.nutrisoft.core.component.service.domain.Service;
 import com.nutrisoft.core.port.out.persistence.service.ServiceRepositoryPort;
 import com.nutrisoft.infrastructure.persistence.jpa.service.mapper.ServiceMapper;
 import com.nutrisoft.infrastructure.persistence.jpa.service.repository.ServiceJpaRepository;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -46,5 +47,12 @@ public class ServicePersistenceAdapter implements ServiceRepositoryPort {
   @Override
   public boolean exists(final UUID id) {
     return serviceJpaRepository.existsById(id);
+  }
+
+  @Override
+  public List<Service> findAll() {
+    log.debug("Retrieving all services from database");
+
+    return serviceJpaRepository.findAll().stream().map(serviceMapper::toDomain).toList();
   }
 }
