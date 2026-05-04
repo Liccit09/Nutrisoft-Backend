@@ -1,6 +1,6 @@
 package com.nutrisoft.userinterface.api.rest.auth.security;
 
-import com.nutrisoft.core.port.out.auth.IdentityManager;
+import com.nutrisoft.core.port.out.auth.CredentialRepository;
 import com.nutrisoft.core.shared.component.common.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final IdentityManager identityManager;
+    private final CredentialRepository credentialRepository;
 
     /**
      * Load user details by email (username).
@@ -30,7 +30,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         log.debug("Loading user details for email: {}", email);
         try {
             Email emailVO = Email.of(email);
-            var credential = identityManager.findByEmail(emailVO)
+            var credential = credentialRepository.findByEmail(emailVO)
                     .orElseThrow(() -> new UsernameNotFoundException("Credential not found for email: " + email));
             
             log.debug("Credential found for email: {}", email);

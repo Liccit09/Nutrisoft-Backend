@@ -43,7 +43,7 @@ public class Appointment extends AggregateRoot<AppointmentId> {
       @NonNull final AppointmentMode mode,
       @NonNull final AppointmentStatus status,
       final String virtualMeetingLink,
-      final LocalDateTime createdAt,
+      @NonNull final LocalDateTime createdAt,
       final LocalDateTime updatedAt) {
     super(id);
     this.patientId = patientId;

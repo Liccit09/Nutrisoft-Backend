@@ -1,9 +1,9 @@
 package com.nutrisoft.core.component.patient.domain;
 
 import com.nutrisoft.core.shared.component.common.ContactInfo;
+import com.nutrisoft.core.shared.component.patient.PatientEvent;
 import com.nutrisoft.core.shared.component.patient.PatientId;
 import com.nutrisoft.core.shared.ddd.AggregateRoot;
-import com.nutrisoft.core.shared.ddd.DomainEvent;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.Getter;
@@ -66,29 +66,14 @@ public class Patient extends AggregateRoot<PatientId> {
             now,
             now);
 
-    patient.registerEvent(new Patient.PatientCreatedEvent(patient.toString(), now));
+    patient.registerEvent(
+        new PatientEvent.PatientCreatedEvent(
+            patient.getId().value().toString(),
+            patient.getContactInfo().email().value(),
+            patient.getFirstName(),
+            patient.getLastName(),
+            now));
 
     return patient;
-  }
-
-  // Domain Events
-
-  public record PatientCreatedEvent(String aggregateId, LocalDateTime occurredAt)
-      implements DomainEvent {
-
-    @Override
-    public String getEventType() {
-      return "PATIENT_CREATED";
-    }
-
-    @Override
-    public String getAggregateId() {
-      return aggregateId;
-    }
-
-    @Override
-    public LocalDateTime getOccurredAt() {
-      return occurredAt;
-    }
   }
 }

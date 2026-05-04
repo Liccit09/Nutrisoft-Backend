@@ -16,7 +16,7 @@ import java.util.UUID;
  * <p>This port is part of the hexagonal architecture's dependency inversion: - Core depends on
  * ports - Infrastructure implements ports
  */
-public interface IdentityManager {
+public interface CredentialRepository {
 
   /**
    * Save or update a credential.

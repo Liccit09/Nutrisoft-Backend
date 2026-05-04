@@ -1,6 +1,6 @@
 package com.nutrisoft.userinterface.api.rest.auth;
 
-import com.nutrisoft.core.port.out.auth.IdentityManager;
+import com.nutrisoft.core.port.out.auth.CredentialRepository;
 import com.nutrisoft.core.shared.component.common.Email;
 import com.nutrisoft.userinterface.api.rest.auth.generated.AuthenticationApi;
 import com.nutrisoft.userinterface.api.rest.auth.generated.model.AuthResponse;
@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController implements AuthenticationApi {
 
-  private final IdentityManager identityManager;
+  private final CredentialRepository credentialRepository;
   private final AuthenticationManager authenticationManager;
   private final JwtTokenProvider jwtTokenProvider;
 
@@ -43,7 +43,7 @@ public class AuthController implements AuthenticationApi {
     // Recuperar credential para validar que existe y está activa
     Email emailVO = Email.of(request.getEmail());
     var credential =
-        identityManager
+        credentialRepository
             .findByEmail(emailVO)
             .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
 

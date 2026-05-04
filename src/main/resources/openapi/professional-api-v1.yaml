@@ -63,10 +63,8 @@ components:
       type: object
       required:
         - email
-        - password
         - firstName
         - lastName
-        - licenseNumber
         - specialization
       properties:
         email:
@@ -79,12 +77,6 @@ components:
           pattern: '^\+?[1-9]\d{1,14}$'
           description: Professional phone number in E.164 format (optional)
           example: +1234567890
-        password:
-          type: string
-          format: password
-          minLength: 8
-          description: Professional password (minimum 8 characters)
-          example: SecurePassword123!
         firstName:
           type: string
           minLength: 1
@@ -97,12 +89,6 @@ components:
           maxLength: 100
           description: Professional last name
           example: López
-        licenseNumber:
-          type: string
-          minLength: 1
-          maxLength: 50
-          description: Professional license number (required)
-          example: LIC-123456
         specialization:
           type: string
           minLength: 1
@@ -113,37 +99,13 @@ components:
     ProfessionalAuthResponse:
       type: object
       required:
-        - token
-        - type
-        - email
-        - role
+        - aggregateId
       properties:
-        token:
-          type: string
-          description: JWT Bearer token for authentication
-          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-        type:
-          type: string
-          default: Bearer
-          description: Token type
-          example: Bearer
         aggregateId:
           type: string
           format: uuid
-          nullable: true
           description: Aggregate ID of the professional
           example: 550e8400-e29b-41d4-a716-446655440000
-        email:
-          type: string
-          format: email
-          description: Professional email
-          example: professional@hospital.com
-        role:
-          type: string
-          enum:
-            - PROFESSIONAL
-          description: Professional role
-          example: PROFESSIONAL
 
     ErrorResponse:
       type: object

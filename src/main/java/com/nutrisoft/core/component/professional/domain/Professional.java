@@ -1,8 +1,10 @@
 package com.nutrisoft.core.component.professional.domain;
 
 import com.nutrisoft.core.shared.component.common.ContactInfo;
+import com.nutrisoft.core.shared.component.professional.ProfessionalEvent;
 import com.nutrisoft.core.shared.component.professional.ProfessionalId;
 import com.nutrisoft.core.shared.ddd.AggregateRoot;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -51,11 +53,22 @@ public class Professional extends AggregateRoot<ProfessionalId> {
       @NonNull final String specialization,
       @NonNull final ContactInfo contactInfo) {
 
-    return new Professional(
-        ProfessionalId.create(),
-        firstName.trim(),
-        lastName.trim(),
-        specialization.trim(),
-        contactInfo);
+    final var professional =
+        new Professional(
+            ProfessionalId.create(),
+            firstName.trim(),
+            lastName.trim(),
+            specialization.trim(),
+            contactInfo);
+
+    professional.registerEvent(
+        new ProfessionalEvent.ProfessionalCreatedEvent(
+            professional.getId().value().toString(),
+            contactInfo.email().value(),
+            firstName,
+            lastName,
+            LocalDateTime.now()));
+
+    return professional;
   }
 }

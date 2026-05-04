@@ -1,6 +1,7 @@
 package com.nutrisoft.core.component.professional.application.usecase;
 
 import com.nutrisoft.core.component.professional.domain.Professional;
+import com.nutrisoft.core.port.out.eventbus.EventBus;
 import com.nutrisoft.core.port.out.persistence.professional.ProfessionalRepositoryPort;
 import com.nutrisoft.core.shared.component.common.ContactInfo;
 import com.nutrisoft.core.shared.component.common.Email;
@@ -16,11 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
  * <p>Located in: Core\Components\Professional\Application\UseCase
  *
  * <p>Responsibility: Handle ONLY the business logic for professional registration. This use case
- * creates and persists the Professional aggregate.
+ * creates, persists the Professional aggregate, stores the password temporarily, and publishes a
+ * ProfessionalRegisteredEvent to trigger credential registration asynchronously.
  *
- * <p>NOTE: Credential creation is NOT the responsibility of this use case. Authentication
- * credentials are managed in the UI layer (AuthenticationService). This keeps the core layer
- * completely independent of authentication infrastructure.
+ * <p>NOTE: Credential creation is NOT done synchronously. Instead, an event is published that will
+ * be consumed by an event listener to register credentials asynchronously.
  */
 @Slf4j
 @Service
@@ -29,38 +30,42 @@ import org.springframework.transaction.annotation.Transactional;
 public class RegisterProfessionalUseCase {
 
   private final ProfessionalRepositoryPort professionalRepository;
+  private final EventBus eventBus;
 
   /**
    * Execute the register professional use case.
    *
-   * <p>This method creates a new Professional aggregate and persists it. Email uniqueness
-   * validation should be done BEFORE calling this (in AuthenticationService).
+   * <p>This method: 1. Creates a new Professional aggregate 2. Persists it to the database 3.
+   * Publishes ProfessionalRegisteredEvent to trigger async credential registration
    *
    * @param firstName The professional's first name
    * @param lastName The professional's last name
    * @param email The professional's email
    * @param phoneNumber The professional's phone number
-   * @param licenseNumber The professional's license number (for auditing/regulatory)
+   * @param specialization The professional's specialization
    * @return The registered professional's ID (aggregateId)
    */
   public ProfessionalId execute(
-      String firstName, String lastName, String email, String phoneNumber, String licenseNumber) {
+      String firstName, String lastName, String email, String phoneNumber, String specialization) {
 
     log.info(
-        "Registering new professional: {} {} (License: {})", firstName, lastName, licenseNumber);
+        "Registering new professional: {} {} (Specialization: {})",
+        firstName,
+        lastName,
+        specialization);
 
-    // Create the Professional aggregate
     Email emailVO = Email.of(email);
     Professional professional =
         Professional.create(
             firstName.trim(),
             lastName.trim(),
-            "General Nutrition", // Default specialization - can be updated later
+            specialization,
             ContactInfo.of(phoneNumber, emailVO));
 
-    // Save the professional aggregate
     professionalRepository.save(professional);
     log.info("Professional successfully registered with ID: {}", professional.getId().value());
+
+    eventBus.publish(professional.pullDomainEvents());
 
     return professional.getId();
   }

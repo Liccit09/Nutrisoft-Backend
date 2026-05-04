@@ -1,9 +1,6 @@
 package com.nutrisoft.userinterface.api.rest.professional;
 
-import com.nutrisoft.core.port.out.auth.IdentityManager;
-import com.nutrisoft.core.shared.component.common.Email;
-import com.nutrisoft.userinterface.api.rest.auth.security.JwtTokenProvider;
-import com.nutrisoft.userinterface.api.rest.auth.service.AuthenticationService;
+import com.nutrisoft.core.component.professional.application.usecase.RegisterProfessionalUseCase;
 import com.nutrisoft.userinterface.api.rest.professional.generated.ProfessionalsApi;
 import com.nutrisoft.userinterface.api.rest.professional.generated.model.ProfessionalAuthResponse;
 import com.nutrisoft.userinterface.api.rest.professional.generated.model.RegisterProfessionalRequest;
@@ -11,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -23,10 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
  * <p>Responsabilidades:
  * - Recibir solicitudes HTTP de profesionales
  * - Validar DTOs
- * - Orquestar seguridad y generación de JWT
+ * - Orquestar registro de profesionales
  * - Retornar respuestas HTTP
  *
- * <p>Delega lógica de negocio a AuthenticationService y casos de uso.
+ * <p>Delega lógica de negocio a RegisterProfessionalUseCase. Las credenciales se crean de forma
+ * asincrónica mediante eventos de dominio.
  *
  * <p>API-First: Implementa la interfaz {@link ProfessionalsApi} generada desde
  * /src/main/resources/openapi/professional-api-v1.yaml
@@ -36,18 +32,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ProfessionalController implements ProfessionalsApi {
 
-  private final AuthenticationService authenticationService;
-  private final IdentityManager identityManager;
-  private final JwtTokenProvider jwtTokenProvider;
+  private final RegisterProfessionalUseCase registerProfessionalUseCase;
 
   /**
    * Register a new professional.
    * POST /api/v1/professionals/register
    *
+   * <p>This endpoint registers a new professional and returns the professional ID. Credentials are
+   * created asynchronously via the event-driven flow (ProfessionalRegistrationEventListener).
+   *
    * @param request Professional registration data
-   * @return ResponseEntity with ProfessionalAuthResponse (201 Created)
+   * @return ResponseEntity with ProfessionalAuthResponse (201 Created) containing professional ID
    * @throws IllegalArgumentException if validation fails
-   * @throws RuntimeException if credential not found after registration
    */
   @Override
   public ResponseEntity<ProfessionalAuthResponse> registerProfessional(
@@ -55,29 +51,22 @@ public class ProfessionalController implements ProfessionalsApi {
 
     log.info("Professional registration endpoint called for email: {}", request.getEmail());
 
-    // Delegar al caso de uso
-    var professionalId = authenticationService.registerProfessional(request);
+    // Register professional using the use case
+    var professionalId =
+        registerProfessionalUseCase.execute(
+            request.getFirstName(),
+            request.getLastName(),
+            request.getEmail(),
+            request.getPhoneNumber(),
+            request.getSpecialization()
+        ); // Password is null - handled by AuthenticationService if needed
 
-    // Recuperar credential para obtener rol
-    Email emailVO = Email.of(request.getEmail());
-    var credential =
-        identityManager
-            .findByEmail(emailVO)
-            .orElseThrow(() -> new RuntimeException("Credential not found after registration"));
-
-    // Generar JWT token
-    Authentication authentication =
-        new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword());
-    String token = jwtTokenProvider.generateToken(authentication, credential.getRole().name());
-
-    // Construir respuesta
+    // Construir respuesta con ID del profesional
     ProfessionalAuthResponse response =
         new ProfessionalAuthResponse()
-            .token(token)
-            .type("Bearer")
-            .aggregateId(professionalId)
-            .email(request.getEmail())
-            .role(ProfessionalAuthResponse.RoleEnum.PROFESSIONAL);
+            .aggregateId(professionalId.value());
+
+    log.info("Professional registered successfully with ID: {}", professionalId.value());
 
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }

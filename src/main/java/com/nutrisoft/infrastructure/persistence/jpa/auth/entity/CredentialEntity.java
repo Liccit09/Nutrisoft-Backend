@@ -31,7 +31,7 @@ import lombok.NoArgsConstructor;
 public class CredentialEntity {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
+  @Column(columnDefinition = "UUID")
   private UUID id;
 
   @Column(nullable = false, unique = true, length = 255)

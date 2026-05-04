@@ -1,9 +1,6 @@
 package com.nutrisoft.userinterface.api.rest.patient;
 
-import com.nutrisoft.core.port.out.auth.IdentityManager;
-import com.nutrisoft.core.shared.component.common.Email;
-import com.nutrisoft.userinterface.api.rest.auth.security.JwtTokenProvider;
-import com.nutrisoft.userinterface.api.rest.auth.service.AuthenticationService;
+import com.nutrisoft.core.component.patient.application.usecase.RegisterPatientUseCase;
 import com.nutrisoft.userinterface.api.rest.patient.generated.PatientsApi;
 import com.nutrisoft.userinterface.api.rest.patient.generated.model.PatientAuthResponse;
 import com.nutrisoft.userinterface.api.rest.patient.generated.model.RegisterPatientRequest;
@@ -11,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -21,9 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
  * <p>Located in: UserInterface\API\REST\Patient
  *
  * <p>Responsabilidades: - Recibir solicitudes HTTP de pacientes - Validar DTOs - Orquestar
- * seguridad y generación de JWT - Retornar respuestas HTTP
+ * registro de pacientes - Retornar respuestas HTTP
  *
- * <p>Delega lógica de negocio a AuthenticationService y casos de uso.
+ * <p>Delega lógica de negocio a RegisterPatientUseCase. Las credenciales se crean de forma
+ * asincrónica mediante eventos de dominio.
  *
  * <p>API-First: Implementa la interfaz {@link PatientsApi} generada desde
  * /src/main/resources/openapi/patient-api-v1.yaml
@@ -33,46 +29,38 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class PatientController implements PatientsApi {
 
-  private final AuthenticationService authenticationService;
-  private final IdentityManager identityManager;
-  private final JwtTokenProvider jwtTokenProvider;
+  private final RegisterPatientUseCase registerPatientUseCase;
 
   /**
    * Register a new patient. POST /api/v1/patients/register
    *
+   * <p>This endpoint registers a new patient and returns the patient ID. Credentials are created
+   * asynchronously via the event-driven flow (PatientRegistrationEventListener).
+   *
    * @param request Patient registration data
-   * @return ResponseEntity with PatientAuthResponse (201 Created)
+   * @return ResponseEntity with PatientAuthResponse (201 Created) containing patient ID
    * @throws IllegalArgumentException if validation fails
-   * @throws RuntimeException if credential not found after registration
    */
   @Override
   public ResponseEntity<PatientAuthResponse> registerPatient(RegisterPatientRequest request) {
 
     log.info("Patient registration endpoint called for email: {}", request.getEmail());
 
-    // Delegar al caso de uso
-    var patientId = authenticationService.registerPatient(request);
+    // Register patient using the use case
+    var patientId =
+        registerPatientUseCase.execute(
+            request.getFirstName(),
+            request.getLastName(),
+            request.getEmail(),
+            request.getPhoneNumber()
+        ); // Password is null - handled by AuthenticationService if needed
 
-    // Recuperar credential para obtener rol
-    Email emailVO = Email.of(request.getEmail());
-    var credential =
-        identityManager
-            .findByEmail(emailVO)
-            .orElseThrow(() -> new RuntimeException("Credential not found after registration"));
-
-    // Generar JWT token
-    Authentication authentication =
-        new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword());
-    String token = jwtTokenProvider.generateToken(authentication, credential.getRole().name());
-
-    // Construir respuesta
+    // Construir respuesta con ID del paciente
     PatientAuthResponse response =
         new PatientAuthResponse()
-            .token(token)
-            .type("Bearer")
-            .aggregateId(patientId)
-            .email(request.getEmail())
-            .role(PatientAuthResponse.RoleEnum.PATIENT);
+            .aggregateId(patientId.value());
+
+    log.info("Patient registered successfully with ID: {}", patientId.value());
 
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }

@@ -1,6 +1,6 @@
 package com.nutrisoft.infrastructure.persistence.jpa.auth;
 
-import com.nutrisoft.core.port.out.auth.IdentityManager;
+import com.nutrisoft.core.port.out.auth.CredentialRepository;
 import com.nutrisoft.core.shared.component.auth.domain.Credential;
 import com.nutrisoft.core.shared.component.common.Email;
 import com.nutrisoft.infrastructure.persistence.jpa.auth.mapper.CredentialMapper;
@@ -18,11 +18,14 @@ import org.springframework.stereotype.Component;
  *
  * <p>This adapter implements the AuthRepositoryPort (defined in Core\Ports). It translates between
  * domain objects and JPA entities for persistence.
+ *
+ * <p>IMPORTANT: The save method explicitly flushes changes to the database within the current
+ * transaction to ensure persistence before event publishing.
  */
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class AuthPersistenceAdapter implements IdentityManager {
+public class AuthPersistenceAdapter implements CredentialRepository {
 
   private final CredentialJpaRepository credentialJpaRepository;
   private final CredentialMapper credentialMapper;

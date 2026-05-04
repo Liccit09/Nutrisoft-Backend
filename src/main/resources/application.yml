@@ -38,19 +38,21 @@ spring:
       adjust-dates-to-context-time-zone: false
 
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${MAIL_USERNAME:your-email@gmail.com}
-    password: ${MAIL_PASSWORD:your-app-password}
-    from: noreply@nutrisoft.com
-    from-name: Nutrisoft
+    # Para desarrollo con Mailpit (Docker): host: localhost, port: 1025
+    # Para producción: reemplazar con servidor SMTP real (Gmail, SendGrid, etc.)
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    from: ${MAIL_FROM:noreply@nutrisoft.com}
+    from-name: ${MAIL_FROM_NAME:Nutrisoft}
     properties:
       mail:
         smtp:
-          auth: true
+          auth: ${MAIL_SMTP_AUTH:false}
           starttls:
-            enable: true
-            required: true
+            enable: ${MAIL_STARTTLS_ENABLE:false}
+            required: ${MAIL_STARTTLS_REQUIRED:false}
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000

@@ -3,7 +3,7 @@
 
 ### ====== VARIABLES ======
 @baseUrl = http://localhost:8080/api
-@appointmentId = fb3fd32e-245d-4ef6-81f1-2e91818d4b1a
+@appointmentId = ada7aaa7-9740-484b-86a9-629c834d594c
 @patientId = 7b2550fe-49a9-440d-91ce-fa2f494060aa
 @professionalId = 650e8400-e29b-41d4-a716-446655440001
 @serviceId = 750e8400-e29b-41d4-a716-446655440001

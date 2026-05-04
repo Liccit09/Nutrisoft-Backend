@@ -1,6 +1,7 @@
 package com.nutrisoft.core.component.patient.application.usecase;
 
 import com.nutrisoft.core.component.patient.domain.Patient;
+import com.nutrisoft.core.port.out.eventbus.EventBus;
 import com.nutrisoft.core.port.out.persistence.patient.PatientRepositoryPort;
 import com.nutrisoft.core.shared.component.common.ContactInfo;
 import com.nutrisoft.core.shared.component.common.Email;
@@ -16,11 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
  * <p>Located in: Core\Components\Patient\Application\UseCase
  *
  * <p>Responsibility: Handle ONLY the business logic for patient registration. This use case creates
- * and persists the Patient aggregate.
+ * and persists the Patient aggregate, stores the password temporarily, then publishes a
+ * PacienteRegistradoDomainEvent to trigger credential registration asynchronously.
  *
- * <p>NOTE: Credential creation is NOT the responsibility of this use case. Authentication
- * credentials are managed in the UI layer (AuthenticationService). This keeps the core layer
- * completely independent of authentication infrastructure.
+ * <p>NOTE: Credential creation is NOT done synchronously. Instead, an event is published that will
+ * be consumed by an event listener to register credentials asynchronously.
  */
 @Slf4j
 @Service
@@ -29,12 +30,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class RegisterPatientUseCase {
 
   private final PatientRepositoryPort patientRepository;
+  private final EventBus eventBus;
 
   /**
    * Execute the register patient use case.
    *
-   * <p>This method creates a new Patient aggregate and persists it. Email uniqueness validation
-   * should be done BEFORE calling this (in AuthenticationService).
+   * <p>This method: 1. Creates a new Patient aggregate 2. Persists it to the database 3. Publishes
+   * PacienteRegistradoDomainEvent to trigger async credential registration
    *
    * @param firstName The patient's first name
    * @param lastName The patient's last name
@@ -46,7 +48,6 @@ public class RegisterPatientUseCase {
 
     log.info("Registering new patient: {} {}", firstName, lastName);
 
-    // Create the Patient aggregate
     Email emailVO = Email.of(email);
     Patient patient =
         Patient.create(
@@ -57,9 +58,10 @@ public class RegisterPatientUseCase {
             null // address (optional for initial registration)
             );
 
-    // Save the patient aggregate
     patientRepository.save(patient);
     log.info("Patient successfully registered with ID: {}", patient.getId().value());
+
+    eventBus.publish(patient.pullDomainEvents());
 
     return patient.getId();
   }

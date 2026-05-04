@@ -1,6 +1,7 @@
 package com.nutrisoft.core.shared.ddd;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,12 +35,9 @@ public abstract class AggregateRoot<I extends AggregateRootId<?>> extends Domain
    *
    * @return List of domain events
    */
-  public List<DomainEvent> getUncommittedEvents() {
-    return new ArrayList<>(this.domainEvents);
-  }
-
-  /** Clear all registered domain events after publishing. */
-  public void markEventsAsPublished() {
+  public List<DomainEvent> pullDomainEvents() {
+    final var registeredDomainEvents = List.copyOf(this.domainEvents);
     this.domainEvents.clear();
+    return registeredDomainEvents;
   }
 }

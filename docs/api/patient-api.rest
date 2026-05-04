@@ -16,11 +16,11 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "email": "juan@example.com",
+  "email": "carlos.marinm@hotmail.com",
   "phoneNumber": "+1234567890",
-  "password": "SecurePassword123!",
-  "firstName": "Juan",
-  "lastName": "García"
+  "password": "Marianne1234!",
+  "firstName": "Carlos",
+  "lastName": "Marin"
 }
 
 ### 2. Registrar otro paciente de prueba
@@ -30,6 +30,7 @@ Accept: application/json
 
 {
   "email": "maria@example.com",
+  "phoneNumber": "+34987654321",
   "password": "SecurePassword456!",
   "firstName": "María",
   "lastName": "López"
@@ -42,6 +43,7 @@ Accept: application/json
 
 {
   "email": "juan@example.com",
+  "phoneNumber": "+34987654321",
   "password": "DifferentPassword123!",
   "firstName": "Juan Duplicate",
   "lastName": "García"
@@ -54,6 +56,7 @@ Accept: application/json
 
 {
   "email": "invalid-email",
+  "phoneNumber": "+34987654321",
   "password": "SecurePassword123!",
   "firstName": "Invalid",
   "lastName": "Email"

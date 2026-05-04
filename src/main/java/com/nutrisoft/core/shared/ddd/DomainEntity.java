@@ -1,10 +1,8 @@
 package com.nutrisoft.core.shared.ddd;
 
-import static lombok.AccessLevel.PROTECTED;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NonNull;
 
 /**
  * Base class for all Domain Entities with Identity. Implements Value Object pattern for Identity
@@ -14,10 +12,13 @@ import lombok.RequiredArgsConstructor;
  *
  * @param <I> The type of identifier
  */
-@RequiredArgsConstructor(access = PROTECTED)
 @Getter
 @EqualsAndHashCode
 public abstract class DomainEntity<I extends Identifier<?>> {
 
   protected final I id;
+
+  protected DomainEntity(@NonNull I id) {
+    this.id = id;
+  }
 }

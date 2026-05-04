@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.mapstruct.Mapper;
 
 import com.nutrisoft.core.shared.component.appointment.AppointmentId;
+import com.nutrisoft.core.shared.component.auth.domain.CredentialId;
 import com.nutrisoft.core.shared.component.patient.PatientId;
 import com.nutrisoft.core.shared.component.professional.ProfessionalId;
 import com.nutrisoft.core.shared.component.service.ServiceId;
@@ -25,4 +26,6 @@ public interface ValueObjectMapper {
   PatientId toPatientId(UUID value);
 
   ServiceId toServiceId(UUID value);
+
+  CredentialId toCredentialId(UUID value);
 }

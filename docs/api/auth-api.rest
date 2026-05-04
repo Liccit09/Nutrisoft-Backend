@@ -18,8 +18,8 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "email": "patient@example.com",
-  "password": "SecurePassword123!"
+  "email": "carlos.marinm@hotmail.com",
+  "password": "dUYSdjHOC*zP#hkM"
 }
 
 ### 2. Login - Profesional
