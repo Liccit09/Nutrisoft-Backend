@@ -1,14 +1,14 @@
--- Nutrisoft - Sample Data for Development and Testing
--- This script populates the database with sample patients, professionals, services, and appointments
+-- Nutrisoft - Datos de Ejemplo para Desarrollo y Pruebas
+-- Este script popula la base de datos con pacientes, profesionales, servicios y citas de ejemplo
 
--- Clear existing data (if needed)
+-- Limpiar datos existentes (si es necesario)
 -- DELETE FROM appointments;
 -- DELETE FROM services;
 -- DELETE FROM professionals;
 -- DELETE FROM patients;
 
 -- =============================================================================
--- PATIENTS - Sample patient data
+-- PACIENTES - Datos de pacientes de ejemplo
 -- =============================================================================
 
 INSERT INTO patients (id, first_name, last_name, date_of_birth, email, phone_number, address, created_at, updated_at)
@@ -21,36 +21,36 @@ VALUES
 ON CONFLICT DO NOTHING;
 
 -- =============================================================================
--- PROFESSIONALS - Sample nutrition professionals
+-- PROFESIONALES - Profesionales de nutrición de ejemplo
 -- =============================================================================
 
 INSERT INTO professionals (id, first_name, last_name, specialization, email, phone_number, created_at, updated_at)
 VALUES
-    ('650e8400-e29b-41d4-a716-446655440001', 'Dr. Patricia', 'Gómez', 'Clinical Nutrition', 'patricia.gomez@nutrisoft.com', '305-555-1001', NOW(), NOW()),
-    ('650e8400-e29b-41d4-a716-446655440002', 'Lic. Fernando', 'Silva', 'Sports Nutrition', 'fernando.silva@nutrisoft.com', '305-555-1002', NOW(), NOW()),
-    ('650e8400-e29b-41d4-a716-446655440003', 'Dra. Gabriela', 'Fuentes', 'Weight Management', 'gabriela.fuentes@nutrisoft.com', '305-555-1003', NOW(), NOW()),
-    ('650e8400-e29b-41d4-a716-446655440004', 'Lic. Miguel', 'Reyes', 'Therapeutic Nutrition', 'miguel.reyes@nutrisoft.com', '305-555-1004', NOW(), NOW())
+    ('650e8400-e29b-41d4-a716-446655440001', 'Dra. Patricia', 'Gómez', 'Nutrición Clínica', 'patricia.gomez@nutrisoft.com', '305-555-1001', NOW(), NOW()),
+    ('650e8400-e29b-41d4-a716-446655440002', 'Lic. Fernando', 'Silva', 'Nutrición Deportiva', 'fernando.silva@nutrisoft.com', '305-555-1002', NOW(), NOW()),
+    ('650e8400-e29b-41d4-a716-446655440003', 'Dra. Gabriela', 'Fuentes', 'Gestión del Peso', 'gabriela.fuentes@nutrisoft.com', '305-555-1003', NOW(), NOW()),
+    ('650e8400-e29b-41d4-a716-446655440004', 'Lic. Miguel', 'Reyes', 'Nutrición Terapéutica', 'miguel.reyes@nutrisoft.com', '305-555-1004', NOW(), NOW())
 ON CONFLICT DO NOTHING;
 
 -- =============================================================================
--- SERVICES - Available nutrition services
+-- SERVICIOS - Servicios de nutrición disponibles
 -- =============================================================================
 
 INSERT INTO services (id, name, description, price, duration_in_minutes, created_at, updated_at)
 VALUES
-    ('750e8400-e29b-41d4-a716-446655440001', 'Initial Consultation', 'Comprehensive nutritional assessment and plan development', 75.00, 60, NOW(), NOW()),
-    ('750e8400-e29b-41d4-a716-446655440002', 'Follow-up Session', 'Progress review and plan adjustment', 50.00, 30, NOW(), NOW()),
-    ('750e8400-e29b-41d4-a716-446655440003', 'Weight Management Program', '12-week structured weight loss program', 200.00, 45, NOW(), NOW()),
-    ('750e8400-e29b-41d4-a716-446655440004', 'Sports Nutrition Plan', 'Customized nutrition for athletic performance', 85.00, 60, NOW(), NOW()),
-    ('750e8400-e29b-41d4-a716-446655440005', 'Diabetes Management', 'Specialized diabetes nutrition counseling', 90.00, 45, NOW(), NOW()),
-    ('750e8400-e29b-41d4-a716-446655440006', 'Meal Planning Session', 'Personalized meal planning and preparation tips', 60.00, 30, NOW(), NOW())
+    ('750e8400-e29b-41d4-a716-446655440001', 'Consulta Inicial', 'Evaluación nutricional integral y desarrollo del plan', 75.00, 60, NOW(), NOW()),
+    ('750e8400-e29b-41d4-a716-446655440002', 'Sesión de Seguimiento', 'Revisión del progreso y ajuste del plan', 50.00, 30, NOW(), NOW()),
+    ('750e8400-e29b-41d4-a716-446655440003', 'Programa de Gestión del Peso', 'Programa estructurado de 12 semanas para pérdida de peso', 200.00, 45, NOW(), NOW()),
+    ('750e8400-e29b-41d4-a716-446655440004', 'Plan de Nutrición Deportiva', 'Nutrición personalizada para el rendimiento atlético', 85.00, 60, NOW(), NOW()),
+    ('750e8400-e29b-41d4-a716-446655440005', 'Gestión de la Diabetes', 'Asesoramiento nutricional especializado en diabetes', 90.00, 45, NOW(), NOW()),
+    ('750e8400-e29b-41d4-a716-446655440006', 'Sesión de Planificación de Comidas', 'Planificación personalizada de comidas y consejos de preparación', 60.00, 30, NOW(), NOW())
 ON CONFLICT DO NOTHING;
 
 -- =============================================================================
--- APPOINTMENTS - Sample appointments
+-- CITAS - Citas de ejemplo
 -- =============================================================================
 
--- Scheduled appointments (next 7 days)
+-- Citas programadas (próximos 7 días)
 INSERT INTO appointments (id, patient_id, professional_id, service_id, start_time, mode, status, virtual_meeting_link, created_at, updated_at)
 VALUES
     ('850e8400-e29b-41d4-a716-446655440001',
@@ -105,7 +105,7 @@ VALUES
 
 ON CONFLICT DO NOTHING;
 
--- Completed appointments (past)
+-- Citas completadas (pasadas)
 INSERT INTO appointments (id, patient_id, professional_id, service_id, start_time, mode, status, virtual_meeting_link, created_at, updated_at)
 VALUES
     ('850e8400-e29b-41d4-a716-446655440010',
@@ -130,7 +130,7 @@ VALUES
 
 ON CONFLICT DO NOTHING;
 
--- Cancelled appointment
+-- Cita cancelada
 INSERT INTO appointments (id, patient_id, professional_id, service_id, start_time, mode, status, virtual_meeting_link, created_at, updated_at)
 VALUES
     ('850e8400-e29b-41d4-a716-446655440020',
@@ -146,10 +146,10 @@ VALUES
 ON CONFLICT DO NOTHING;
 
 -- =============================================================================
--- Verify data insertion
+-- Verificar la inserción de datos
 -- =============================================================================
 
--- Show patient count
+-- Mostrar recuento de pacientes
 -- SELECT COUNT(*) as patient_count FROM patients;
 -- SELECT COUNT(*) as professional_count FROM professionals;
 -- SELECT COUNT(*) as service_count FROM services;
