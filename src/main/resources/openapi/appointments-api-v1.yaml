@@ -432,6 +432,116 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /v1/appointments/availability/dates:
+    get:
+      summary: Get available dates for appointment booking
+      description: Retrieve available dates for appointment booking based on service and optional professional
+      operationId: getAvailableDates
+      tags:
+        - Availability
+      security: []
+      parameters:
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          description: The start date (inclusive) - format yyyy-MM-dd
+          example: "2026-05-15"
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          description: The end date (inclusive) - format yyyy-MM-dd
+          example: "2026-06-15"
+        - name: serviceId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The service ID
+        - name: professionalId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: Optional professional ID. If not provided, returns general availability
+      responses:
+        '200':
+          description: Available dates retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailableDatesResponse'
+        '400':
+          description: Invalid input parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/appointments/availability/time-slots:
+    get:
+      summary: Get available time slots for a specific date
+      description: Retrieve available time slots for a specific date based on service and optional professional
+      operationId: getAvailableTimeSlots
+      tags:
+        - Availability
+      security: []
+      parameters:
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          description: The date to check availability for - format yyyy-MM-dd
+          example: "2026-05-20"
+        - name: serviceId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The service ID
+        - name: professionalId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: Optional professional ID. If not provided, returns general availability
+      responses:
+        '200':
+          description: Available time slots retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailableTimeSlotsResponse'
+        '400':
+          description: Invalid input parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   schemas:
     CreateAppointmentRequest:
@@ -546,3 +656,57 @@ components:
         path:
           type: string
 
+    AvailableDatesResponse:
+      type: object
+      properties:
+        availableDates:
+          type: array
+          description: List of available dates
+          items:
+            type: string
+            format: date
+            example: "2026-05-20"
+        serviceId:
+          type: string
+          format: uuid
+          description: The service ID
+        professionalId:
+          type: string
+          format: uuid
+          description: The professional ID (if specified)
+
+    AvailableTimeSlotsResponse:
+      type: object
+      properties:
+        availableSlots:
+          type: array
+          description: List of available time slots
+          items:
+            $ref: '#/components/schemas/TimeSlot'
+        serviceId:
+          type: string
+          format: uuid
+          description: The service ID
+
+    TimeSlot:
+      type: object
+      properties:
+        startTime:
+          type: string
+          format: date-time
+          description: Start time of the slot (ISO 8601 format)
+          example: "2026-05-20T09:00:00Z"
+        endTime:
+          type: string
+          format: date-time
+          description: End time of the slot (ISO 8601 format)
+          example: "2026-05-20T09:15:00Z"
+        availableProfessionalIds:
+          type: array
+          description: List of professional IDs available for this time slot
+          items:
+            type: string
+            format: uuid
+          example:
+            - "550e8400-e29b-41d4-a716-446655440000"
+            - "550e8400-e29b-41d4-a716-446655440001"

@@ -145,6 +145,33 @@ VALUES
 
 ON CONFLICT DO NOTHING;
 
+-- Insert default schedules for existing professionals
+-- Default: Monday-Friday 9:00 AM to 5:00 PM, Saturday-Sunday off
+
+-- Find all professionals and create schedules for them
+-- Note: This assumes professionals already exist in the system
+
+INSERT INTO schedules (id, professional_id, weekly_schedule_json, breaks_json, special_days_json, created_at, updated_at)
+SELECT
+    gen_random_uuid(),
+    p.id,
+    '[
+        {"day":"SUNDAY","startTime":"00:00:00","endTime":"00:00:01","isWorkingDay":false},
+        {"day":"MONDAY","startTime":"09:00:00","endTime":"17:00:00","isWorkingDay":true},
+        {"day":"TUESDAY","startTime":"09:00:00","endTime":"17:00:00","isWorkingDay":true},
+        {"day":"WEDNESDAY","startTime":"09:00:00","endTime":"17:00:00","isWorkingDay":true},
+        {"day":"THURSDAY","startTime":"09:00:00","endTime":"17:00:00","isWorkingDay":true},
+        {"day":"FRIDAY","startTime":"09:00:00","endTime":"17:00:00","isWorkingDay":true},
+        {"day":"SATURDAY","startTime":"00:00:00","endTime":"00:00:01","isWorkingDay":false}
+    ]',
+    '[]',
+    '[]',
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
+FROM professionals p
+WHERE NOT EXISTS (SELECT 1 FROM schedules WHERE professional_id = p.id);
+
+
 -- =============================================================================
 -- Verificar la inserción de datos
 -- =============================================================================

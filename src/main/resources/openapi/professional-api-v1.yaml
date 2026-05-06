@@ -18,6 +18,29 @@ tags:
     description: Professional registration and management operations
 
 paths:
+  /v1/professionals:
+    get:
+      summary: Get all professionals
+      description: Retrieves a list of all professionals (public endpoint)
+      operationId: getAllProfessionals
+      tags:
+        - Professionals
+      responses:
+        '200':
+          description: List of all professionals retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfessionalResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /v1/professionals/register:
     post:
       summary: Register a new professional
@@ -59,6 +82,48 @@ paths:
 
 components:
   schemas:
+    ProfessionalResponse:
+      type: object
+      required:
+        - aggregateId
+        - firstName
+        - lastName
+        - specialization
+      properties:
+        aggregateId:
+          type: string
+          format: uuid
+          description: Aggregate ID of the professional
+          example: 550e8400-e29b-41d4-a716-446655440000
+        firstName:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Professional first name
+          example: Dr. Carlos
+        lastName:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Professional last name
+          example: López
+        specialization:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Professional specialization
+          example: Nutrición Deportiva
+        phoneNumber:
+          type: string
+          pattern: '^\+?[1-9]\d{1,14}$'
+          description: Professional phone number in E.164 format
+          example: +1234567890
+        email:
+          type: string
+          format: email
+          description: Professional email address
+          example: professional@hospital.com
+
     RegisterProfessionalRequest:
       type: object
       required:

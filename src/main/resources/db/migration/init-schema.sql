@@ -101,3 +101,19 @@ CREATE INDEX idx_credentials_aggregate_id ON credentials(aggregate_id);
 
 -- Create index on role for role-based queries
 CREATE INDEX idx_credentials_role ON credentials(role);
+
+-- Create schedules table for availability management
+CREATE TABLE IF NOT EXISTS schedules (
+    id UUID PRIMARY KEY,
+    professional_id UUID NOT NULL UNIQUE,
+    weekly_schedule_json TEXT NOT NULL,
+    breaks_json TEXT,
+    special_days_json TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_schedules_professional_id FOREIGN KEY (professional_id)
+        REFERENCES professionals(id) ON DELETE CASCADE
+);
+
+-- Create index for faster lookups
+CREATE INDEX IF NOT EXISTS idx_schedules_professional_id ON schedules(professional_id);
