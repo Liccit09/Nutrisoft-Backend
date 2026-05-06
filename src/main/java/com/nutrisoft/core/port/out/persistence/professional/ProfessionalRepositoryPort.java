@@ -1,6 +1,7 @@
 package com.nutrisoft.core.port.out.persistence.professional;
 
 import com.nutrisoft.core.component.professional.domain.Professional;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,4 +23,7 @@ public interface ProfessionalRepositoryPort {
 
   /** Check if a professional exists. */
   boolean exists(UUID id);
+
+  /** Find all professionals. */
+  List<Professional> findAll();
 }

@@ -43,6 +43,7 @@ public class SecurityConfig {
     // Endpoint constants - Routes only (without HTTP methods)
     private static final String ENDPOINT_AUTH_LOGIN = "/v1/auth/login";
     private static final String ENDPOINT_PATIENT_REGISTER = "/v1/patients/register";
+    private static final String ENDPOINT_PROFESSIONALS = "/v1/professionals";
     private static final String ENDPOINT_PROFESSIONAL_REGISTER = "/v1/professionals/register";
     private static final String ENDPOINT_APPOINTMENTS = "/v1/appointments";
     private static final String ENDPOINT_APPOINTMENTS_ID = "/v1/appointments/{appointmentId}";
@@ -54,6 +55,8 @@ public class SecurityConfig {
     private static final String ENDPOINT_APPOINTMENTS_VIRTUAL_LINK = "/v1/appointments/{appointmentId}/virtual-link";
     private static final String ENDPOINT_APPOINTMENTS_BY_PATIENT = "/v1/appointments/patient/{patientId}";
     private static final String ENDPOINT_APPOINTMENTS_BY_PROFESSIONAL = "/v1/appointments/professional/{professionalId}";
+    private static final String ENDPOINT_AVAILABILITY_DATES = "/v1/appointments/availability/dates";
+    private static final String ENDPOINT_AVAILABILITY_TIME_SLOTS = "/v1/appointments/availability/time-slots";
     private static final String ENDPOINT_PROFILE = "/v1/profile";
     private static final String ENDPOINT_ADMIN = "/v1/admin/**";
     private static final String ENDPOINT_USERS = "/v1/users/**";
@@ -109,8 +112,15 @@ public class SecurityConfig {
                     // Patient API - Registration
                     .requestMatchers("POST", ENDPOINT_PATIENT_REGISTER).permitAll()
                     
+                    // Professional API - List all professionals (GET only)
+                    .requestMatchers("GET", ENDPOINT_PROFESSIONALS).permitAll()
+                    
                     // Service API - List all services (GET only)
                     .requestMatchers("GET", ENDPOINT_SERVICES).permitAll()
+                    
+                    // Availability API - Public access (no authentication required)
+                    .requestMatchers("GET", ENDPOINT_AVAILABILITY_DATES).permitAll()
+                    .requestMatchers("GET", ENDPOINT_AVAILABILITY_TIME_SLOTS).permitAll()
                     
                     // Swagger UI and API Documentation - ALL PUBLIC
                     .requestMatchers(ENDPOINT_SWAGGER_UI).permitAll()

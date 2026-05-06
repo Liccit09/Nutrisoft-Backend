@@ -4,6 +4,7 @@ import com.nutrisoft.core.component.professional.domain.Professional;
 import com.nutrisoft.core.port.out.persistence.professional.ProfessionalRepositoryPort;
 import com.nutrisoft.infrastructure.persistence.jpa.professional.mapper.ProfessionalMapper;
 import com.nutrisoft.infrastructure.persistence.jpa.professional.repository.ProfessionalJpaRepository;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -46,5 +47,15 @@ public class ProfessionalPersistenceAdapter implements ProfessionalRepositoryPor
   @Override
   public boolean exists(final UUID id) {
     return professionalJpaRepository.existsById(id);
+  }
+
+  @Override
+  public List<Professional> findAll() {
+    log.debug("Retrieving all professionals from database");
+
+    return professionalJpaRepository.findAll()
+        .stream()
+        .map(professionalMapper::toDomain)
+        .toList();
   }
 }
