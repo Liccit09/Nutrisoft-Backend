@@ -1,8 +1,10 @@
 package com.nutrisoft.userinterface.api.rest.professional;
 
+import com.nutrisoft.core.component.professional.application.usecase.GetAllProfessionalsUseCase;
 import com.nutrisoft.core.component.professional.application.usecase.RegisterProfessionalUseCase;
 import com.nutrisoft.userinterface.api.rest.professional.generated.ProfessionalsApi;
 import com.nutrisoft.userinterface.api.rest.professional.generated.model.ProfessionalAuthResponse;
+import com.nutrisoft.userinterface.api.rest.professional.generated.model.ProfessionalResponse;
 import com.nutrisoft.userinterface.api.rest.professional.generated.model.RegisterProfessionalRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,40 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProfessionalController implements ProfessionalsApi {
 
   private final RegisterProfessionalUseCase registerProfessionalUseCase;
+  private final GetAllProfessionalsUseCase getAllProfessionalsUseCase;
+
+  /**
+   * Get all professionals.
+   * GET /api/v1/professionals
+   *
+   * <p>This endpoint retrieves all professionals from the database. It is a public endpoint.
+   *
+   * @return ResponseEntity with list of ProfessionalResponse (200 OK)
+   */
+  @Override
+  public ResponseEntity<java.util.List<ProfessionalResponse>> getAllProfessionals() {
+
+    log.info("Get all professionals endpoint called");
+
+    // Get all professionals using the use case
+    var professionals = getAllProfessionalsUseCase.execute();
+
+    // Convert domain professionals to API responses
+    java.util.List<ProfessionalResponse> responses = professionals.stream()
+        .map(professional -> new ProfessionalResponse()
+            .aggregateId(professional.getId().value())
+            .firstName(professional.getFirstName())
+            .lastName(professional.getLastName())
+            .specialization(professional.getSpecialization())
+            .phoneNumber(professional.getContactInfo().phoneNumber())
+            .email(professional.getContactInfo().email().value())
+        )
+        .toList();
+
+    log.info("Retrieved {} professionals successfully", responses.size());
+
+    return ResponseEntity.ok(responses);
+  }
 
   /**
    * Register a new professional.
@@ -71,4 +107,7 @@ public class ProfessionalController implements ProfessionalsApi {
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 }
+
+
+
 

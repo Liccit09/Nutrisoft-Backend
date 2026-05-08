@@ -28,6 +28,12 @@ services:
     ports:
       - "1025:1025"  # SMTP port
       - "8025:8025"  # Web UI port
+    volumes:
+      - mailpit_data:/data  # Persistir correos y datos de Mailpit
+    environment:
+      # Configurar Mailpit para usar almacenamiento persistente en /data
+      MP_DATA_FILE: /data/mailpit.db
+    command: ["-d", "/data/mailpit.db"]  # Especificar directorio de datos
     networks:
       - nutrisoft-network
     healthcheck:
@@ -42,5 +48,7 @@ networks:
 
 volumes:
   postgres_data:
+    driver: local
+  mailpit_data:
     driver: local
 
