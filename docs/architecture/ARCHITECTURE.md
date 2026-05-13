@@ -2,12 +2,14 @@
 
 ## Overview
 
-Nutrisoft Backend is a Spring Boot 4 application implementing an appointment scheduling system for nutrition clinics. The architecture follows:
+Nutrisoft Backend is a Spring Boot 3.3.0 application implementing an appointment scheduling system for nutrition clinics. The architecture follows:
 
 - **Hexagonal Architecture (Ports & Adapters)** for clear separation of concerns
 - **Domain-Driven Design (DDD)** with Aggregates, Entities, and Value Objects
 - **Package by Component** structure for explicit and scalable domain organization
-- **Single Bounded Context** (Appointment) with anti-corruption layers for external entities
+- **Multiple Bounded Contexts**: Appointment (principal), Patient, Professional, Service, and Schedule
+- **Event-Driven Architecture** with domain events and event publishing
+- **Prepared for Microservices**: Can evolve to independent services when needed
 
 ## Architecture Principles
 
@@ -59,94 +61,182 @@ The application is organized into concentric layers:
 
 ### Domain-Driven Design
 
-#### Bounded Context: Appointment
+#### Bounded Contexts: Componentes Principales
 
-The single bounded context handles all appointment-related operations.
+El proyecto implementa múltiples bounded contexts organizados por componentes:
 
-**Aggregate Root: Appointment**
-- Manages appointments with full lifecycle
-- Enforces business invariants
-- Publishes domain events
+**1. Appointment (Contexto Principal)**
+- Gestiona citas con ciclo de vida completo
+- Orquesta la interacción entre Paciente, Profesional y Servicio
+- Aggregate Root: `Appointment`
+- Value Objects: `AppointmentStatus`, `AppointmentMode`
+- Eventos: `AppointmentCreatedEvent`, `AppointmentConfirmedEvent`, etc.
 
-**Entities:**
-- `Appointment` (Aggregate Root)
-- `Patient` (within appointment context)
-- `Professional` (within appointment context)
-- `Service` (within appointment context)
+**2. Patient (Contexto de Pacientes)**
+- Gestiona información de pacientes
+- Entity: `Patient`
+- Casos de uso: crear, actualizar, obtener pacientes
 
-**Value Objects:**
-- `AppointmentStatus` - Immutable appointment state
-- `TimeSlot` - Represents start/end time with validation
-- `ContactInfo` - Email and phone information
+**3. Professional (Contexto de Profesionales)**
+- Gestiona información de profesionales
+- Entity: `Professional`
+- Casos de uso: crear, actualizar, obtener profesionales
 
-**Repository:**
-- `AppointmentRepository` - Domain port for persistence
+**4. Service (Contexto de Servicios)**
+- Gestiona servicios/procedimientos disponibles
+- Entity: `Service`
+- Casos de uso: crear, actualizar, obtener servicios
 
-#### Anti-Corruption Layer
-
-External entities are accessed via secondary ports:
-- `PatientPort` - Provides patient data
-- `ProfessionalPort` - Provides professional data
-- `ServicePort` - Provides service data
-
-When these entities become separate Bounded Contexts, implementations can switch to message brokers or HTTP clients without domain layer changes.
+**5. Schedule (Contexto de Disponibilidad)**
+- Gestiona horarios de profesionales y disponibilidad
+- Aggregate Root: `Schedule`
+- Value Objects: `WorkingHours`, `BreakSlot`, `SpecialDay`
+- Entidades: `AvailabilityCalculator` (Lógica de cálculo de disponibilidad)
+- Casos de uso: obtener disponibilidad, gestionar horarios
 
 ### Package by Component Structure
 
+La estructura del proyecto implementa una arquitectura de componentes/bounded contexts con separación clara entre capas:
+
 ```
 com.nutrisoft/
-├── appointment/                              # Bounded Context: Appointment
-│   ├── domain/                              # Domain Layer (No dependencies on external libs except value objects)
-│   │   ├── model/                           # Domain models
-│   │   │   ├── Appointment.java            # Aggregate root
-│   │   │   ├── Patient.java                # Entity
-│   │   │   ├── Professional.java           # Entity
-│   │   │   ├── Service.java                # Entity
-│   │   │   ├── AppointmentStatus.java      # Value Object
-│   │   │   ├── TimeSlot.java               # Value Object
-│   │   │   └── ContactInfo.java            # Value Object
-│   │   ├── repository/                      # Domain repository interfaces
-│   │   │   └── AppointmentRepository.java
-│   │   └── event/                           # Domain events
-│   │
-│   ├── application/                         # Application Layer
-│   │   ├── service/                         # Use case implementations
-│   │   │   └── AppointmentApplicationService.java
-│   │   ├── dto/                             # Data Transfer Objects
-│   │   │   ├── AppointmentCommandDto.java
-│   │   │   └── AppointmentResponseDto.java
-│   │   ├── port/                            # Application ports
-│   │   │   ├── AppointmentUseCasePort.java # Input port (use cases)
-│   │   │   ├── PatientPort.java            # Output port (external)
-│   │   │   ├── ProfessionalPort.java       # Output port (external)
-│   │   │   └── ServicePort.java            # Output port (external)
-│   │   └── usecase/                         # Specific use cases (if needed)
-│   │
-│   ├── primary/                             # Primary Adapter (REST)
-│   │   └── adapter/
-│   │       └── api/
-│   │           ├── AppointmentController.java
-│   │           └── mapper/
-│   │
-│   └── secondary/                           # Secondary Adapter (Persistence)
-│       └── adapter/
-│           └── persistence/
-│               ├── AppointmentPersistenceAdapter.java
-│               ├── PatientPersistenceAdapter.java
-│               ├── ProfessionalPersistenceAdapter.java
-│               ├── ServicePersistenceAdapter.java
-│               ├── entity/                  # JPA Entities
-│               ├── mapper/                  # MapStruct mappers
-│               └── repository/              # JPA Repository interfaces
 │
-└── shared/                                  # Shared kernel
-    ├── domain/                              # Base domain classes
-    │   ├── DomainEntity.java
-    │   ├── AggregateRoot.java
-    │   ├── ValueObject.java
-    │   └── DomainEvent.java
-    ├── application/
-    └── infrastructure/
+├── core/                                    # Núcleo de la aplicación (Domain + Application)
+│   │
+│   ├── component/                           # Componentes por Bounded Context
+│   │   │
+│   │   ├── appointment/                     # Bounded Context: Appointment (Contexto Principal)
+│   │   │   ├── domain/
+│   │   │   │   ├── Appointment.java        # Aggregate Root
+│   │   │   │   ├── AppointmentStatus.java  # Value Object
+│   │   │   │   └── AppointmentMode.java    # Value Object
+│   │   │   └── application/
+│   │   │       ├── command/                # DTOs para comandos
+│   │   │       ├── listener/               # Event listeners
+│   │   │       ├── notification/           # Notificaciones
+│   │   │       └── usecase/                # Casos de uso
+│   │   │
+│   │   ├── patient/                         # Bounded Context: Patient
+│   │   │   ├── domain/
+│   │   │   │   └── Patient.java            # Entity
+│   │   │   └── application/
+│   │   │       └── usecase/                # Casos de uso para pacientes
+│   │   │
+│   │   ├── professional/                    # Bounded Context: Professional
+│   │   │   ├── domain/
+│   │   │   │   └── Professional.java       # Entity
+│   │   │   └── application/
+│   │   │       └── usecase/                # Casos de uso para profesionales
+│   │   │
+│   │   ├── service/                         # Bounded Context: Service
+│   │   │   ├── domain/
+│   │   │   │   └── Service.java            # Entity
+│   │   │   └── application/
+│   │   │       └── usecase/                # Casos de uso para servicios
+│   │   │
+│   │   └── schedule/                        # Bounded Context: Schedule (Disponibilidad)
+│   │       ├── domain/
+│   │       │   ├── Schedule.java           # Entity
+│   │       │   ├── WorkingHours.java       # Value Object
+│   │       │   ├── BreakSlot.java          # Value Object
+│   │       │   ├── SpecialDay.java         # Value Object
+│   │       │   ├── DayOfWeek.java          # Enum
+│   │       │   └── AvailabilityCalculator.java # Lógica de cálculo
+│   │       └── application/
+│   │           ├── dto/                    # DTOs para schedule
+│   │           └── usecase/                # Casos de uso
+│   │
+│   ├── port/                                # Puertos (Interfaces de contrato)
+│   │   ├── in/
+│   │   │   ├── commandbus/                 # Input Port: Command Bus
+│   │   │   └── querybus/                   # Input Port: Query Bus
+│   │   └── out/
+│   │       ├── persistence/                # Output Port: Persistencia
+│   │       ├── eventbus/                   # Output Port: Event Bus
+│   │       ├── notifications/              # Output Port: Notificaciones
+│   │       └── auth/                       # Output Port: Autenticación
+│   │
+│   └── shared/                              # Shared Kernel (Código compartido)
+│       ├── ddd/
+│       │   ├── AggregateRoot.java          # Base para Aggregate Roots
+│       │   ├── AggregateRootId.java        # Base para IDs de agregados
+│       │   ├── DomainEntity.java           # Base para entidades
+│       │   ├── DomainEvent.java            # Base para eventos de dominio
+│       │   ├── Identifier.java             # Base para identificadores
+│       │   └── ValueObject.java            # Base para value objects
+│       ├── component/                       # Componentes compartidos
+│       └── mapper/                          # Mappers compartidos
+│
+├── infrastructure/                          # Adaptadores Secundarios (Implementaciones)
+│   │
+│   ├── persistence/
+│   │   └── jpa/                            # Implementación JPA/Hibernate
+│   │       ├── appointment/                # Entities JPA para Appointment
+│   │       ├── auth/                       # Entities JPA para Auth
+│   │       ├── patient/                    # Entities JPA para Patient
+│   │       ├── professional/               # Entities JPA para Professional
+│   │       ├── schedule/                   # Entities JPA para Schedule
+│   │       └── service/                    # Entities JPA para Service
+│   │
+│   ├── auth/
+│   │   └── BCryptPasswordHasher.java       # Implementación de hash de contraseñas
+│   │
+│   ├── event/
+│   │   └── SpringEventBusAdapter.java      # Implementación del Event Bus con Spring
+│   │
+│   └── notification/
+│       ├── adapter/                        # Adaptadores de notificación
+│       ├── service/                        # Servicios de notificación
+│       └── template/                       # Plantillas de notificación
+│
+└── userinterface/                           # Adaptadores Primarios (Entry Points)
+    └── api/
+        └── rest/                           # REST API
+            ├── appointment/                # REST Controllers para Appointments
+            ├── auth/                       # REST Controllers para Autenticación
+            ├── availability/               # REST Controllers para Disponibilidad
+            ├── patient/                    # REST Controllers para Patients
+            ├── professional/               # REST Controllers para Professionals
+            ├── service/                    # REST Controllers para Services
+            ├── config/                     # Configuración de REST
+            └── exception/                  # Manejo de excepciones REST
+```
+
+## Puertos y Adaptadores (Hexagonal Architecture)
+
+### Input Ports (Puertos de Entrada)
+- **CommandBus** (`com.nutrisoft.core.port.in.commandbus/`) - Orquesta comandos de aplicación
+- **QueryBus** (`com.nutrisoft.core.port.in.querybus/`) - Orquesta consultas de aplicación
+- **REST Controllers** (`com.nutrisoft.userinterface.api.rest/`) - Adaptadores primarios HTTP
+
+### Output Ports (Puertos de Salida)
+- **PersistencePort** (`com.nutrisoft.core.port.out.persistence/`) - Contrato para acceso a datos
+  - Implementación: `com.nutrisoft.infrastructure.persistence.jpa/`
+  - Usa JPA/Hibernate con PostgreSQL
+- **EventBusPort** (`com.nutrisoft.core.port.out.eventbus/`) - Publicación de eventos
+  - Implementación: `com.nutrisoft.infrastructure.event.SpringEventBusAdapter`
+- **NotificationsPort** (`com.nutrisoft.core.port.out.notifications/`) - Envío de notificaciones
+  - Implementación: `com.nutrisoft.infrastructure.notification/`
+  - Incluye: adapter, service, template
+- **AuthPort** (`com.nutrisoft.core.port.out.auth/`) - Autenticación y autorización
+  - Implementación: `com.nutrisoft.infrastructure.auth.BCryptPasswordHasher`
+
+### Flujo de Datos (Request → Response)
+
+```
+HTTP Request
+    ↓
+REST Controller (userinterface/api/rest/)
+    ↓
+Use Case / Application Service (core/component/*/application/usecase/)
+    ↓
+Domain Model (core/component/*/domain/)
+    ↓
+Output Ports (core/port/out/)
+    ↓
+Adapters Implementation (infrastructure/*)
+    ↓
+External Systems (Database, Event Bus, Email, etc.)
 ```
 
 ## Technology Stack
@@ -154,9 +244,9 @@ com.nutrisoft/
 - **Java 21** - Latest LTS version
 - **Spring Boot 3.3.0** - Web framework
 - **Spring Data JPA** - ORM and persistence
-- **PostgreSQL 16** - Database
-- **MapStruct 1.5.5** - Object mapping
-- **Lombok** - Boilerplate reduction
+- **PostgreSQL 42.7.3** - Database driver
+- **MapStruct 1.5.5.Final** - Object mapping
+- **Lombok 1.18.30** - Boilerplate reduction
 - **SpringDoc OpenAPI 2.3.0** - API documentation
 - **Docker Compose** - Local development database
 
@@ -308,31 +398,43 @@ NO_SHOW: Can transition to NO_SHOW from SCHEDULED or CONFIRMED
 
 ## Scalability & Future Bounded Contexts
 
-The current architecture supports future expansion:
+La arquitectura actual ya está preparada para evolucionar a múltiples Bounded Contexts independientes. Actualmente, Patient, Professional, Service y Schedule están co-localizados en el mismo proyecto pero en componentes separados. Cuando sea necesario escalar:
 
-### Patient Bounded Context (Future)
+### Patient Bounded Context (Futuro)
 
-When Patient becomes a separate BC:
-1. Create `com.nutrisoft.patient` package
-2. Implement Patient model in its own domain
-3. Replace `PatientPort` adapter with HTTP or message broker client
-4. Use shared events/Saga pattern for inter-context communication
+Cuando Patient se separe en un BC independiente:
+1. Crear `com.nutrisoft.patient` en un proyecto separado
+2. Implementar Patient model en su propio dominio
+3. Exponer APIs REST para patient management
+4. El Appointment context consumirá datos de Patient BC via HTTP o message broker
+5. Usar patrones de Saga para coordinar cambios entre contextos
 
-### Professional Bounded Context (Future)
+### Professional Bounded Context (Futuro)
 
-When Professional becomes a separate BC:
-1. Create `com.nutrisoft.professional` package
-2. Implement Professional model in its own domain
-3. Replace `ProfessionalPort` adapter with HTTP or message broker client
-4. Coordinate changes with Appointment context
+Cuando Professional se separe en un BC independiente:
+1. Crear `com.nutrisoft.professional` en un proyecto separado
+2. Implementar Professional model en su propio dominio
+3. Exponer APIs REST para professional management
+4. El Appointment context consumirá datos de Professional BC via HTTP o message broker
+5. Coordinar cambios en disponibilidad con Schedule context
 
-### Service Bounded Context (Future)
+### Service Bounded Context (Futuro)
 
-When Service becomes a separate BC:
-1. Create `com.nutrisoft.service` package
-2. Implement Service model in its own domain
-3. Replace `ServicePort` adapter with HTTP or message broker client
-4. Handle service availability and pricing updates
+Cuando Service se separe en un BC independiente:
+1. Crear `com.nutrisoft.service` en un proyecto separado
+2. Implementar Service model en su propio dominio
+3. Exponer APIs REST para service management
+4. El Appointment context consumirá datos de Service BC via HTTP o message broker
+5. Gestionar actualizaciones de precios y disponibilidad de servicios
+
+### Schedule Bounded Context (Futuro)
+
+Cuando Schedule se separe en un BC independiente:
+1. Crear `com.nutrisoft.schedule` en un proyecto separado
+2. Implementar Schedule model en su propio dominio
+3. Exponer APIs REST para schedule management
+4. Mantener sincronización de disponibilidad con Professional context
+5. Usar event sourcing para auditar cambios en horarios
 
 ## Database Schema
 

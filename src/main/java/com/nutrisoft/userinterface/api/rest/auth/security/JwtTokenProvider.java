@@ -30,6 +30,9 @@ public class JwtTokenProvider {
   @Value("${app.jwtExpirationMs:86400000}")
   private int jwtExpirationMs;
 
+  @Value("${app.jwtRefreshExpirationMs:604800000}")
+  private int jwtRefreshExpirationMs; // 7 days by default
+
   /**
    * Generate JWT token from Authentication object. Usa el principal de la Authentication (que puede
    * ser email o UserPrincipal).
@@ -64,6 +67,29 @@ public class JwtTokenProvider {
         .subject(email) // Email como subject
         .claim("email", email)
         .claim("role", role)
+        .claim("token_type", "access")
+        .issuedAt(now)
+        .expiration(expiryDate)
+        .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes()))
+        .compact();
+  }
+
+  /**
+   * Generate refresh JWT token. Este token tiene mayor duración y debe ser persistido en BD.
+   *
+   * @param email Email del usuario
+   * @param role Rol del usuario
+   * @return Refresh JWT token
+   */
+  public String generateRefreshToken(String email, String role) {
+    Date now = new Date();
+    Date expiryDate = new Date(now.getTime() + jwtRefreshExpirationMs);
+
+    return Jwts.builder()
+        .subject(email) // Email como subject
+        .claim("email", email)
+        .claim("role", role)
+        .claim("token_type", "refresh")
         .issuedAt(now)
         .expiration(expiryDate)
         .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes()))
@@ -92,6 +118,18 @@ public class JwtTokenProvider {
             .getBody();
 
     return (String) claims.get("role");
+  }
+
+  /** Get token type from JWT token (access or refresh). */
+  public String getTokenTypeFromToken(String token) {
+    Claims claims =
+        Jwts.parser()
+            .setSigningKey(Keys.hmacShaKeyFor(jwtSecret.getBytes()))
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
+
+    return (String) claims.getOrDefault("token_type", "access");
   }
 
   /** Validate JWT token. */

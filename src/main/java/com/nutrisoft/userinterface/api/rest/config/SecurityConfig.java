@@ -42,6 +42,8 @@ public class SecurityConfig {
 
     // Endpoint constants - Routes only (without HTTP methods)
     private static final String ENDPOINT_AUTH_LOGIN = "/v1/auth/login";
+    private static final String ENDPOINT_AUTH_REFRESH_TOKEN = "/v1/auth/refresh-token";
+    private static final String ENDPOINT_AUTH_LOGOUT = "/v1/auth/logout";
     private static final String ENDPOINT_PATIENT_REGISTER = "/v1/patients/register";
     private static final String ENDPOINT_PROFESSIONALS = "/v1/professionals";
     private static final String ENDPOINT_PROFESSIONAL_REGISTER = "/v1/professionals/register";
@@ -108,6 +110,12 @@ public class SecurityConfig {
                     // ========== PUBLIC ENDPOINTS (No authentication required) ==========
                     // Auth API - Login
                     .requestMatchers("POST", ENDPOINT_AUTH_LOGIN).permitAll()
+                    
+                    // Auth API - Refresh token (uses refreshToken cookie)
+                    .requestMatchers("POST", ENDPOINT_AUTH_REFRESH_TOKEN).permitAll()
+                    
+                    // Auth API - Logout (allows authenticated users to logout)
+                    .requestMatchers("POST", ENDPOINT_AUTH_LOGOUT).permitAll()
                     
                     // Patient API - Registration
                     .requestMatchers("POST", ENDPOINT_PATIENT_REGISTER).permitAll()

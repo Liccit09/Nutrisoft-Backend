@@ -61,6 +61,7 @@ spring:
 app:
   jwtSecret: ${JWT_SECRET:nutrisoft-secret-key-for-jwt-token-generation-and-validation-purpose-only}
   jwtExpirationMs: 86400000  # 24 hours
+  jwtRefreshExpirationMs: 604800000  # 7 days
   resetTokenExpirationHours: 24
   frontend:
     baseUrl: ${FRONTEND_BASE_URL:http://localhost:3000}
