@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cita Cancelada - Nutrisoft</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #d32f2f 0%, #c62828 100%);
+            color: #ffffff;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 40px;
+        }
+        .notification-section {
+            margin-bottom: 30px;
+        }
+        .notification-section h2 {
+            color: #d32f2f;
+            font-size: 22px;
+            margin: 0 0 15px 0;
+        }
+        .appointment-details {
+            background-color: #ffebee;
+            border-left: 4px solid #d32f2f;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .detail-row {
+            display: flex;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #d32f2f;
+            width: 140px;
+            flex-shrink: 0;
+        }
+        .detail-value {
+            color: #333;
+            flex: 1;
+        }
+        .info-section {
+            background-color: #f5f5f5;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #333;
+        }
+        .footer {
+            background-color: #f9f9f9;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #eee;
+        }
+        .footer p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✕ Cita Cancelada</h1>
+            <p>Ha sido cancelada una cita en tu agenda</p>
+        </div>
+
+        <div class="content">
+            <div class="notification-section">
+                <h2>¡Hola <span th:text="${professionalName}">Profesional</span>!</h2>
+                <p>La cita agendada con el paciente <strong th:text="${patientName}">Paciente</strong> ha sido cancelada.</p>
+            </div>
+
+            <div class="appointment-details">
+                <div class="detail-row">
+                    <div class="detail-label">Paciente:</div>
+                    <div class="detail-value" th:text="${patientName}">Nombre Paciente</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Servicio:</div>
+                    <div class="detail-value" th:text="${serviceName}">Consulta Nutrición</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Fecha y Hora:</div>
+                    <div class="detail-value" th:text="${appointmentDateTime}">01/06/2026 10:30</div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <strong>ℹ️ Información:</strong> Tu horario ha sido liberado. Si el paciente desea reprogramar, contáctalo directamente.
+            </div>
+
+            <p style="margin: 20px 0; color: #666; font-size: 14px;">
+                Esta es una notificación automática. Por favor, no respondas a este correo.
+            </p>
+        </div>
+
+        <div class="footer">
+            <p><strong>Nutrisoft</strong></p>
+            <p>Plataforma de Gestión Nutricional</p>
+            <p>© 2026 Nutrisoft. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>
+

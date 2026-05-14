@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enlace de Consulta Virtual - Nutrisoft</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+            color: #ffffff;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 40px;
+        }
+        .virtual-meeting-section {
+            margin-bottom: 30px;
+        }
+        .virtual-meeting-section h2 {
+            color: #0066cc;
+            font-size: 22px;
+            margin: 0 0 15px 0;
+        }
+        .appointment-details {
+            background-color: #e7f3ff;
+            border-left: 4px solid #0066cc;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .detail-row {
+            display: flex;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #0066cc;
+            width: 140px;
+            flex-shrink: 0;
+        }
+        .detail-value {
+            color: #333;
+            flex: 1;
+        }
+        .link-section {
+            background-color: #f0f0f0;
+            border: 2px dashed #0066cc;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .link-section h3 {
+            margin: 0 0 10px 0;
+            color: #0066cc;
+        }
+        .virtual-link {
+            background-color: #0066cc;
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 4px;
+            display: inline-block;
+            text-decoration: none;
+            font-weight: 600;
+            word-break: break-all;
+            font-size: 12px;
+        }
+        .important-note {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #856404;
+        }
+        .footer {
+            background-color: #f9f9f9;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #eee;
+        }
+        .footer p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎥 Enlace de Consulta Virtual</h1>
+            <p>Tu consulta está lista para comenzar</p>
+        </div>
+
+        <div class="content">
+            <div class="virtual-meeting-section">
+                <h2>¡Hola <span th:text="${patientName}">Paciente</span>!</h2>
+                <p>El profesional <strong th:text="${professionalName}">Profesional</strong> ha compartido el enlace para tu consulta virtual.</p>
+            </div>
+
+            <div class="appointment-details">
+                <div class="detail-row">
+                    <div class="detail-label">Servicio:</div>
+                    <div class="detail-value" th:text="${serviceName}">Consulta Nutrición</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Profesional:</div>
+                    <div class="detail-value" th:text="${professionalName}">Profesional</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Fecha y Hora:</div>
+                    <div class="detail-value" th:text="${appointmentDateTime}">15/06/2026 14:30</div>
+                </div>
+            </div>
+
+            <div class="link-section">
+                <h3>Accede a tu Consulta Virtual</h3>
+                <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Haz clic en el enlace para iniciar tu consulta:</p>
+                <div class="virtual-link" th:text="${virtualMeetingLink}">https://meet.example.com/consultation</div>
+                <p style="font-size: 12px; color: #666; margin-top: 15px;">Si el enlace anterior no funciona, cópialo en tu navegador.</p>
+            </div>
+
+            <div class="important-note">
+                <strong>💡 Recomendaciones:</strong>
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                    <li>Conecta 5 minutos antes de la hora programada</li>
+                    <li>Asegúrate de tener buena conexión a internet</li>
+                    <li>Usa un dispositivo con cámara y micrófono (computadora, tablet o smartphone)</li>
+                </ul>
+            </div>
+
+            <p style="margin: 20px 0; color: #666; font-size: 14px;">
+                Si tienes problemas para acceder, contáctanos para asistencia.
+            </p>
+        </div>
+
+        <div class="footer">
+            <p><strong>Nutrisoft</strong></p>
+            <p>Plataforma de Gestión Nutricional</p>
+            <p>© 2026 Nutrisoft. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>
+

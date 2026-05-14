@@ -68,7 +68,13 @@ public class AppointmentEvent {
   /**
    * Event published when an appointment is cancelled.
    */
-  public record AppointmentCancelledEvent(String aggregateId, LocalDateTime occurredAt)
+  public record AppointmentCancelledEvent(
+      String aggregateId,
+      LocalDateTime occurredAt,
+      String patientId,
+      String professionalId,
+      String serviceId,
+      LocalDateTime startTime)
       implements DomainEvent {
     @Override
     public String getEventType() {
@@ -132,7 +138,14 @@ public class AppointmentEvent {
    * Event published when an appointment is updated (e.g., rescheduled or virtual meeting link
    * registered).
    */
-  public record AppointmentUpdatedEvent(String aggregateId, LocalDateTime occurredAt)
+  public record AppointmentUpdatedEvent(
+      String aggregateId,
+      LocalDateTime occurredAt,
+      String patientId,
+      String professionalId,
+      String serviceId,
+      LocalDateTime newStartTime,
+      String virtualMeetingLink)
       implements DomainEvent {
     @Override
     public String getEventType() {

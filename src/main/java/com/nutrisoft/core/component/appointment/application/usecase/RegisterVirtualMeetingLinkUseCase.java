@@ -1,6 +1,7 @@
 package com.nutrisoft.core.component.appointment.application.usecase;
 
 import com.nutrisoft.core.component.appointment.domain.Appointment;
+import com.nutrisoft.core.port.out.eventbus.EventBus;
 import com.nutrisoft.core.port.out.persistence.appointment.AppointmentRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ import java.util.UUID;
 public class RegisterVirtualMeetingLinkUseCase {
 
   private final AppointmentRepositoryPort appointmentRepository;
+  private final EventBus eventBus;
 
   /**
    * Execute the register virtual meeting link use case.
@@ -42,6 +44,9 @@ public class RegisterVirtualMeetingLinkUseCase {
 
     appointment.registerVirtualMeetingLink(virtualMeetingLink);
     appointmentRepository.save(appointment);
+
+    // Publish domain events
+    eventBus.publish(appointment.pullDomainEvents());
 
     log.info("Virtual meeting link registered successfully for appointment: {}", appointmentId);
 

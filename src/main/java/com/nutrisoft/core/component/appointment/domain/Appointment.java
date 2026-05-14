@@ -140,7 +140,13 @@ public class Appointment extends AggregateRoot<AppointmentId> {
     this.updatedAt = LocalDateTime.now();
     validate();
     this.registerEvent(
-        new AppointmentEvent.AppointmentCancelledEvent(this.id.toString(), LocalDateTime.now()));
+        new AppointmentEvent.AppointmentCancelledEvent(
+            this.id.toString(),
+            LocalDateTime.now(),
+            patientId.value().toString(),
+            professionalId.value().toString(),
+            serviceId.value().toString(),
+            startTime));
   }
 
   /** Mark the appointment as completed. */
@@ -185,7 +191,14 @@ public class Appointment extends AggregateRoot<AppointmentId> {
     this.updatedAt = LocalDateTime.now();
     validate();
     this.registerEvent(
-        new AppointmentEvent.AppointmentUpdatedEvent(this.id.toString(), LocalDateTime.now()));
+        new AppointmentEvent.AppointmentUpdatedEvent(
+            this.id.toString(),
+            LocalDateTime.now(),
+            patientId.value().toString(),
+            professionalId.value().toString(),
+            serviceId.value().toString(),
+            newStartTime,
+            virtualMeetingLink));
   }
 
   /**
@@ -206,6 +219,13 @@ public class Appointment extends AggregateRoot<AppointmentId> {
     this.updatedAt = LocalDateTime.now();
     validate();
     this.registerEvent(
-        new AppointmentEvent.AppointmentUpdatedEvent(this.id.toString(), LocalDateTime.now()));
+        new AppointmentEvent.AppointmentUpdatedEvent(
+            this.id.toString(),
+            LocalDateTime.now(),
+            patientId.value().toString(),
+            professionalId.value().toString(),
+            serviceId.value().toString(),
+            startTime,
+            virtualMeetingLink));
   }
 }

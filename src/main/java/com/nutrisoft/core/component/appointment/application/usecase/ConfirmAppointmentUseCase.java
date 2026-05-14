@@ -1,6 +1,7 @@
 package com.nutrisoft.core.component.appointment.application.usecase;
 
 import com.nutrisoft.core.component.appointment.domain.Appointment;
+import com.nutrisoft.core.port.out.eventbus.EventBus;
 import com.nutrisoft.core.port.out.persistence.appointment.AppointmentRepositoryPort;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ConfirmAppointmentUseCase {
 
   private final AppointmentRepositoryPort appointmentRepository;
+  private final EventBus eventBus;
 
   /**
    * Executes the use case to confirm an appointment by its ID. Validates the appointment exists.
@@ -40,6 +42,9 @@ public class ConfirmAppointmentUseCase {
 
     appointment.confirm();
     appointmentRepository.save(appointment);
+
+    // Publish domain events
+    eventBus.publish(appointment.pullDomainEvents());
 
     log.info("Appointment confirmed successfully: {}", appointmentId);
 
