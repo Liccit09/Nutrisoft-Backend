@@ -57,6 +57,98 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /v1/auth/refresh-token:
+    post:
+      summary: Refresh access token
+      description: |
+        Renueva el access token usando el refresh token enviado como cookie HttpOnly.
+        El refresh token debe estar presente en la cookie 'refreshToken'.
+      operationId: refreshToken
+      tags:
+        - Authentication
+      parameters:
+        - name: refreshToken
+          in: cookie
+          description: HttpOnly cookie containing the refresh token JWT
+          required: false
+          schema:
+            type: string
+      requestBody:
+        description: Empty request body - token is provided via cookie
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Nuevo access token generado correctamente. Incluye nueva cookie de refresh token.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: New refreshToken cookie (HttpOnly, Secure, SameSite=Strict)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Refresh token inválido, ausente, expirado o revocado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                no_token:
+                  value:
+                    error: Unauthorized
+                    message: Refresh token not provided
+                invalid_token:
+                  value:
+                    error: Unauthorized
+                    message: Refresh token is invalid or has expired
+                wrong_type:
+                  value:
+                    error: Unauthorized
+                    message: Token type is not a refresh token
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/auth/logout:
+    post:
+      summary: Logout user
+      description: |
+        Revoca el refresh token actual y limpia la cookie.
+        Esto cierra la sesión actual del usuario.
+      operationId: logout
+      tags:
+        - Authentication
+      parameters:
+        - name: refreshToken
+          in: cookie
+          description: HttpOnly cookie containing the refresh token JWT
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Logout exitoso. Cookie de refresh token limpiada.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: refreshToken cookie cleared (expired)
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   schemas:
 

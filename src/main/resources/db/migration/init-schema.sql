@@ -117,3 +117,31 @@ CREATE TABLE IF NOT EXISTS schedules (
 
 -- Create index for faster lookups
 CREATE INDEX IF NOT EXISTS idx_schedules_professional_id ON schedules(professional_id);
+
+-- Create refresh_tokens table for managing refresh token lifecycle
+-- This table enables token revocation, session management, and audit trail
+CREATE TABLE IF NOT EXISTS refresh_tokens (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    credential_id UUID NOT NULL,
+    token TEXT NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    revoked BOOLEAN NOT NULL DEFAULT false,
+    revoked_at TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    used_at TIMESTAMP,
+    user_agent VARCHAR(500),
+    ip_address VARCHAR(45),
+    CONSTRAINT fk_refresh_token_credential FOREIGN KEY (credential_id)
+        REFERENCES credentials(id) ON DELETE CASCADE
+);
+
+-- Create indexes for efficient queries
+CREATE INDEX IF NOT EXISTS idx_refresh_tokens_credential_id ON refresh_tokens(credential_id);
+CREATE INDEX IF NOT EXISTS idx_refresh_tokens_token ON refresh_tokens(token);
+CREATE INDEX IF NOT EXISTS idx_refresh_tokens_expires_at ON refresh_tokens(expires_at);
+CREATE INDEX IF NOT EXISTS idx_refresh_tokens_revoked ON refresh_tokens(revoked);
+
+-- Create index to help find valid (non-revoked, non-expired) tokens
+CREATE INDEX IF NOT EXISTS idx_refresh_tokens_valid
+    ON refresh_tokens(credential_id)
+    WHERE revoked = false;
