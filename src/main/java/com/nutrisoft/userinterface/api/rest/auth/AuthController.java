@@ -123,7 +123,9 @@ public class AuthController implements AuthenticationApi {
 
   /** Refresh access token using refresh token cookie */
   @Override
-  public ResponseEntity<AuthResponse> refreshToken(@CookieValue(value = "refreshToken", required = false) final String refreshToken) {
+  public ResponseEntity<AuthResponse> refreshToken(
+      @CookieValue(value = "refreshToken", required = false) final String refreshToken,
+      @org.springframework.web.bind.annotation.RequestBody(required = false) Object body) {
     // Validar que el refresh token fue proporcionado
     if (refreshToken == null || refreshToken.isEmpty()) {
       log.warn("Refresh token endpoint called without refresh token cookie");

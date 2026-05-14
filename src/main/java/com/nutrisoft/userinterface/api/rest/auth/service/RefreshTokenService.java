@@ -33,7 +33,8 @@ public class RefreshTokenService {
   private int jwtRefreshExpirationMs;
 
   /**
-   * Creates and persists a new refresh token
+   * Creates and persists a new refresh token.
+   * Automatically revokes all previous active tokens for this credential to prevent duplicates.
    *
    * @param credential The credential entity
    * @param token The refresh token JWT
@@ -43,9 +44,10 @@ public class RefreshTokenService {
    */
   public RefreshTokenEntity createRefreshToken(
       CredentialEntity credential, String token, String userAgent, String ipAddress) {
-    // Clean up old refresh tokens for this credential (keep only latest ones)
-    // This is optional - depends on business requirements
-    // refreshTokenRepository.deleteExpiredTokens(LocalDateTime.now());
+    // Revoke all active (non-revoked) tokens for this credential to prevent duplicates
+    // This ensures only the latest token is valid for each credential
+    refreshTokenRepository.revokeAllByCredentialId(credential.getId());
+    log.debug("Revoked all previous tokens for credential: {}", credential.getEmail());
 
     LocalDateTime expiresAt =
         LocalDateTime.now().plus(jwtRefreshExpirationMs, ChronoUnit.MILLIS);
@@ -71,24 +73,15 @@ public class RefreshTokenService {
    * @return RefreshTokenEntity if valid, Optional.empty() if invalid or revoked
    */
   public Optional<RefreshTokenEntity> validateRefreshToken(String token) {
-    Optional<RefreshTokenEntity> refreshToken = refreshTokenRepository.findByToken(token);
+    java.util.List<RefreshTokenEntity> refreshTokens = refreshTokenRepository.findByToken(token);
 
-    if (refreshToken.isEmpty()) {
-      log.warn("Refresh token not found in database");
+    if (refreshTokens.isEmpty()) {
+      log.warn("Refresh token not found, revoked, or expired in database");
       return Optional.empty();
     }
 
-    RefreshTokenEntity rt = refreshToken.get();
-
-    if (rt.getRevoked()) {
-      log.warn("Refresh token has been revoked for credential: {}", rt.getCredential().getEmail());
-      return Optional.empty();
-    }
-
-    if (LocalDateTime.now().isAfter(rt.getExpiresAt())) {
-      log.warn("Refresh token has expired for credential: {}", rt.getCredential().getEmail());
-      return Optional.empty();
-    }
+    // Get the first (most recent) token - in case of duplicates, use the latest one
+    RefreshTokenEntity rt = refreshTokens.get(0);
 
     // Mark as used
     rt.markAsUsed();
@@ -98,18 +91,21 @@ public class RefreshTokenService {
   }
 
   /**
-   * Revokes a refresh token (e.g., on logout)
+   * Revokes a refresh token (e.g., on logout).
+   * Revokes all records with the same token to handle duplicates.
    *
    * @param token The refresh token JWT
    */
   public void revokeRefreshToken(String token) {
-    Optional<RefreshTokenEntity> refreshToken = refreshTokenRepository.findByToken(token);
-    refreshToken.ifPresent(
-        rt -> {
-          rt.revoke();
-          refreshTokenRepository.save(rt);
-          log.info("Refresh token revoked for credential: {}", rt.getCredential().getEmail());
-        });
+    java.util.List<RefreshTokenEntity> refreshTokens = refreshTokenRepository.findByTokenAnyStatus(token);
+    
+    for (RefreshTokenEntity rt : refreshTokens) {
+      if (!rt.getRevoked()) {  // Only revoke if not already revoked
+        rt.revoke();
+        refreshTokenRepository.save(rt);
+        log.info("Refresh token revoked for credential: {}", rt.getCredential().getEmail());
+      }
+    }
   }
 
   /**

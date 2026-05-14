@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -16,9 +17,18 @@ import org.springframework.data.repository.query.Param;
 public interface RefreshTokenJpaRepository extends JpaRepository<RefreshTokenEntity, UUID> {
 
   /**
-   * Find a refresh token by its token string
+   * Find a valid (not revoked and not expired) refresh token by its token string.
+   * Returns a list (should typically have 0 or 1 result) to avoid NonUniqueResultException.
    */
-  Optional<RefreshTokenEntity> findByToken(String token);
+  @Query("SELECT rt FROM RefreshTokenEntity rt WHERE rt.token = :token AND rt.revoked = false AND rt.expiresAt > CURRENT_TIMESTAMP ORDER BY rt.createdAt DESC")
+  java.util.List<RefreshTokenEntity> findByToken(@Param("token") String token);
+
+  /**
+   * Find any refresh token by its token string (regardless of status - used for revocation).
+   * Returns a list to avoid NonUniqueResultException when multiple records exist.
+   */
+  @Query("SELECT rt FROM RefreshTokenEntity rt WHERE rt.token = :token ORDER BY rt.createdAt DESC")
+  java.util.List<RefreshTokenEntity> findByTokenAnyStatus(@Param("token") String token);
 
   /**
    * Find valid (not revoked and not expired) refresh tokens for a credential
@@ -29,6 +39,7 @@ public interface RefreshTokenJpaRepository extends JpaRepository<RefreshTokenEnt
   /**
    * Delete expired refresh tokens (cleanup old tokens)
    */
+  @Modifying
   @Query("DELETE FROM RefreshTokenEntity rt WHERE rt.expiresAt <= :now")
   void deleteExpiredTokens(@Param("now") LocalDateTime now);
 
@@ -41,6 +52,7 @@ public interface RefreshTokenJpaRepository extends JpaRepository<RefreshTokenEnt
   /**
    * Revoke all active refresh tokens for a credential
    */
+  @Modifying
   @Query("UPDATE RefreshTokenEntity rt SET rt.revoked = true, rt.revokedAt = CURRENT_TIMESTAMP WHERE rt.credential.id = :credentialId AND rt.revoked = false")
   void revokeAllByCredentialId(@Param("credentialId") UUID credentialId);
 }

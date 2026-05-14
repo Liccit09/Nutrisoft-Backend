@@ -73,6 +73,13 @@ paths:
           required: false
           schema:
             type: string
+      requestBody:
+        description: Empty request body - token is provided via cookie
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         '200':
           description: Nuevo access token generado correctamente. Incluye nueva cookie de refresh token.
