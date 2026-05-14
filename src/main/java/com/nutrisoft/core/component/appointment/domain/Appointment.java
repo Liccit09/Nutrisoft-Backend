@@ -1,11 +1,11 @@
 package com.nutrisoft.core.component.appointment.domain;
 
+import com.nutrisoft.core.shared.component.appointment.AppointmentEvent;
 import com.nutrisoft.core.shared.component.appointment.AppointmentId;
 import com.nutrisoft.core.shared.component.patient.PatientId;
 import com.nutrisoft.core.shared.component.professional.ProfessionalId;
 import com.nutrisoft.core.shared.component.service.ServiceId;
 import com.nutrisoft.core.shared.ddd.AggregateRoot;
-import com.nutrisoft.core.shared.ddd.DomainEvent;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NonNull;
@@ -102,7 +102,15 @@ public class Appointment extends AggregateRoot<AppointmentId> {
             now);
 
     // Register domain event
-    appointment.registerEvent(new AppointmentCreatedEvent(appointmentId.toString(), now));
+    appointment.registerEvent(
+        new AppointmentEvent.AppointmentCreatedEvent(
+            appointmentId.toString(),
+            now,
+            patientId.value().toString(),
+            professionalId.value().toString(),
+            serviceId.value().toString(),
+            startTime,
+            mode.name()));
 
     return appointment;
   }
@@ -116,7 +124,8 @@ public class Appointment extends AggregateRoot<AppointmentId> {
     this.status = AppointmentStatus.CONFIRMED;
     this.updatedAt = LocalDateTime.now();
     validate();
-    this.registerEvent(new AppointmentConfirmedEvent(this.id.toString(), LocalDateTime.now()));
+    this.registerEvent(
+        new AppointmentEvent.AppointmentConfirmedEvent(this.id.toString(), LocalDateTime.now()));
   }
 
   /**
@@ -130,7 +139,8 @@ public class Appointment extends AggregateRoot<AppointmentId> {
     this.status = AppointmentStatus.CANCELLED;
     this.updatedAt = LocalDateTime.now();
     validate();
-    this.registerEvent(new AppointmentCancelledEvent(this.id.toString(), LocalDateTime.now()));
+    this.registerEvent(
+        new AppointmentEvent.AppointmentCancelledEvent(this.id.toString(), LocalDateTime.now()));
   }
 
   /** Mark the appointment as completed. */
@@ -143,7 +153,8 @@ public class Appointment extends AggregateRoot<AppointmentId> {
     this.status = AppointmentStatus.COMPLETED;
     this.updatedAt = LocalDateTime.now();
     validate();
-    this.registerEvent(new AppointmentCompletedEvent(this.id.toString(), LocalDateTime.now()));
+    this.registerEvent(
+        new AppointmentEvent.AppointmentCompletedEvent(this.id.toString(), LocalDateTime.now()));
   }
 
   /** Mark the appointment as no-show. */
@@ -155,7 +166,8 @@ public class Appointment extends AggregateRoot<AppointmentId> {
     this.status = AppointmentStatus.NO_SHOW;
     this.updatedAt = LocalDateTime.now();
     validate();
-    this.registerEvent(new AppointmentNoShowEvent(this.id.toString(), LocalDateTime.now()));
+    this.registerEvent(
+        new AppointmentEvent.AppointmentNoShowEvent(this.id.toString(), LocalDateTime.now()));
   }
 
   /**
@@ -172,7 +184,8 @@ public class Appointment extends AggregateRoot<AppointmentId> {
     this.startTime = newStartTime;
     this.updatedAt = LocalDateTime.now();
     validate();
-    this.registerEvent(new AppointmentUpdatedEvent(this.id.toString(), LocalDateTime.now()));
+    this.registerEvent(
+        new AppointmentEvent.AppointmentUpdatedEvent(this.id.toString(), LocalDateTime.now()));
   }
 
   /**
@@ -192,116 +205,7 @@ public class Appointment extends AggregateRoot<AppointmentId> {
     this.virtualMeetingLink = virtualMeetingLink;
     this.updatedAt = LocalDateTime.now();
     validate();
-    this.registerEvent(new AppointmentUpdatedEvent(this.id.toString(), LocalDateTime.now()));
-  }
-
-  // Domain Events
-
-  public record AppointmentCreatedEvent(String aggregateId, LocalDateTime occurredAt)
-      implements DomainEvent {
-    @Override
-    public String getEventType() {
-      return "APPOINTMENT_CREATED";
-    }
-
-    @Override
-    public String getAggregateId() {
-      return aggregateId;
-    }
-
-    @Override
-    public LocalDateTime getOccurredAt() {
-      return occurredAt;
-    }
-  }
-
-  public record AppointmentConfirmedEvent(String aggregateId, LocalDateTime occurredAt)
-      implements DomainEvent {
-    @Override
-    public String getEventType() {
-      return "APPOINTMENT_CONFIRMED";
-    }
-
-    @Override
-    public String getAggregateId() {
-      return aggregateId;
-    }
-
-    @Override
-    public LocalDateTime getOccurredAt() {
-      return occurredAt;
-    }
-  }
-
-  public record AppointmentCancelledEvent(String aggregateId, LocalDateTime occurredAt)
-      implements DomainEvent {
-    @Override
-    public String getEventType() {
-      return "APPOINTMENT_CANCELLED";
-    }
-
-    @Override
-    public String getAggregateId() {
-      return aggregateId;
-    }
-
-    @Override
-    public LocalDateTime getOccurredAt() {
-      return occurredAt;
-    }
-  }
-
-  public record AppointmentCompletedEvent(String aggregateId, LocalDateTime occurredAt)
-      implements DomainEvent {
-    @Override
-    public String getEventType() {
-      return "APPOINTMENT_COMPLETED";
-    }
-
-    @Override
-    public String getAggregateId() {
-      return aggregateId;
-    }
-
-    @Override
-    public LocalDateTime getOccurredAt() {
-      return occurredAt;
-    }
-  }
-
-  public record AppointmentNoShowEvent(String aggregateId, LocalDateTime occurredAt)
-      implements DomainEvent {
-    @Override
-    public String getEventType() {
-      return "APPOINTMENT_NO_SHOW";
-    }
-
-    @Override
-    public String getAggregateId() {
-      return aggregateId;
-    }
-
-    @Override
-    public LocalDateTime getOccurredAt() {
-      return occurredAt;
-    }
-  }
-
-  public record AppointmentUpdatedEvent(String aggregateId, LocalDateTime occurredAt)
-      implements DomainEvent {
-    @Override
-    public String getEventType() {
-      return "APPOINTMENT_UPDATED";
-    }
-
-    @Override
-    public String getAggregateId() {
-      return aggregateId;
-    }
-
-    @Override
-    public LocalDateTime getOccurredAt() {
-      return occurredAt;
-    }
+    this.registerEvent(
+        new AppointmentEvent.AppointmentUpdatedEvent(this.id.toString(), LocalDateTime.now()));
   }
 }

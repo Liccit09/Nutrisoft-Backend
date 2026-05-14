@@ -7,13 +7,12 @@ import com.nutrisoft.core.component.patient.application.usecase.GetPatientByIdUs
 import com.nutrisoft.core.component.professional.application.usecase.GetProfessionalByIdUseCase;
 import com.nutrisoft.core.component.schedule.domain.AvailabilityCalculator;
 import com.nutrisoft.core.component.service.application.usecase.GetServiceByIdUseCase;
+import com.nutrisoft.core.port.out.eventbus.EventBus;
 import com.nutrisoft.core.port.out.persistence.appointment.AppointmentRepositoryPort;
 import com.nutrisoft.core.port.out.persistence.schedule.ScheduleRepositoryPort;
 import com.nutrisoft.core.shared.component.patient.PatientId;
 import com.nutrisoft.core.shared.component.professional.ProfessionalId;
 import com.nutrisoft.core.shared.component.service.ServiceId;
-import java.time.LocalDateTime;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,6 +38,7 @@ public class CreateAppointmentUseCase {
 
   private final AppointmentRepositoryPort appointmentRepository;
   private final ScheduleRepositoryPort scheduleRepository;
+  private final EventBus eventBus;
 
   /**
    * Executes the use case to create a new appointment based on the provided command DTO.
@@ -66,6 +66,9 @@ public class CreateAppointmentUseCase {
             commandDto.getVirtualMeetingLink());
 
     appointmentRepository.save(appointment);
+
+    // Publish domain events
+    eventBus.publish(appointment.pullDomainEvents());
 
     log.info("Appointment created successfully with ID: {}", appointment.getId());
 

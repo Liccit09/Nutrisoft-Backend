@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Cita Programada - Nutrisoft</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 40px;
+        }
+        .notification-section {
+            margin-bottom: 30px;
+        }
+        .notification-section h2 {
+            color: #667eea;
+            font-size: 22px;
+            margin: 0 0 15px 0;
+        }
+        .appointment-details {
+            background-color: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .detail-row {
+            display: flex;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #667eea;
+            width: 140px;
+            flex-shrink: 0;
+        }
+        .detail-value {
+            color: #333;
+            flex: 1;
+        }
+        .appointment-mode {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        .mode-virtual {
+            background-color: #e7f3ff;
+            color: #0066cc;
+        }
+        .mode-presencial {
+            background-color: #e7ffe7;
+            color: #008000;
+        }
+        .reminder-section {
+            background-color: #e8f4f8;
+            border-left: 4px solid #0288d1;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #01579b;
+        }
+        .footer {
+            background-color: #f9f9f9;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #eee;
+        }
+        .footer p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📅 Nueva Cita Programada</h1>
+            <p>Se ha registrado una nueva cita en tu agenda</p>
+        </div>
+
+        <div class="content">
+            <div class="notification-section">
+                <h2>¡Hola <span th:text="${professionalName}">Profesional</span>!</h2>
+                <p>Se ha programado una nueva cita con el paciente <strong th:text="${patientName}">Paciente</strong> en tu agenda.</p>
+            </div>
+
+            <div class="appointment-details">
+                <div class="detail-row">
+                    <div class="detail-label">Paciente:</div>
+                    <div class="detail-value" th:text="${patientName}">Nombre Paciente</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Servicio:</div>
+                    <div class="detail-value" th:text="${serviceName}">Consulta Nutrición</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Fecha y Hora:</div>
+                    <div class="detail-value" th:text="${appointmentDateTime}">01/06/2026 10:30</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Modalidad:</div>
+                    <div class="detail-value">
+                        <span th:if="${appointmentMode == 'VIRTUAL'}" class="appointment-mode mode-virtual">Consulta Virtual</span>
+                        <span th:if="${appointmentMode == 'PRESENCIAL'}" class="appointment-mode mode-presencial">Consulta Presencial</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reminder-section">
+                <strong>📌 Recordatorio:</strong> Asegúrate de que tu horario esté disponible. Si hay algún conflicto, por favor notifica al paciente lo antes posible.
+            </div>
+
+            <p style="margin: 20px 0; color: #666; font-size: 14px;">
+                Esta es una notificación automática. Por favor, no respondas a este correo.
+            </p>
+        </div>
+
+        <div class="footer">
+            <p><strong>Nutrisoft</strong></p>
+            <p>Plataforma de Gestión Nutricional</p>
+            <p>© 2026 Nutrisoft. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>
+
